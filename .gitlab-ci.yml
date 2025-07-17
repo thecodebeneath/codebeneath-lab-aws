@@ -1,0 +1,67 @@
+stages:
+  - validate
+  - build
+  - deploy
+  - cleanup
+
+variables:
+  # AWS_ROLE_ARN: "arn:aws:iam::MY_ACCOUNT_ID:role/GitlabIacRole"
+  # AWS_WEB_IDENTITY_TOKEN_FILE: "${CI_PROJECT_DIR}/aws_oidc_token.json"
+  # AWS_ROLE_SESSION_NAME: "GitlabIac-${CI_JOB_ID}"
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform
+  DESTROY_INFRA:
+    description: "Optional action to destroy managed resources"
+    value: "false"
+
+default:
+  image: 
+    name: hashicorp/terraform:latest
+    entrypoint: [""]
+  tags:
+    - labs
+  # id_tokens: # Request an OIDC token
+  #   GITLAB_OIDC_TOKEN:
+  #     aud: # Optional: specify audience if required by your IdP config in AWS
+  #       - https://git.codebeneath.org
+  before_script:
+    - cd ${TF_ROOT}
+    - echo "${GITLAB_OIDC_TOKEN}" > ${AWS_WEB_IDENTITY_TOKEN_FILE}
+    - terraform --version
+    - terraform init -input=false
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+
+plan:
+  stage: build
+  script:
+    - terraform plan -out=tfplan -input=false
+  artifacts:
+    paths:
+      - ${TF_ROOT}/tfplan
+    access: 'developer'
+    expire_in: "5 days"
+
+apply:
+  stage: deploy
+  dependencies:
+    - plan
+  script:
+    - terraform apply -input=false tfplan
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH     # Apply only on default branch
+      when: manual                                    # Manual trigger for prod changes in best practice
+    - if: $CI_COMMIT_BRANCH =~ /^env\//
+      when: on_success
+
+destroy:
+  stage: cleanup
+  needs:
+    - job: validate
+  script:
+    - terraform destroy -input=false -auto-approve
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $DESTROY_INFRA == "true"   # Requires explicit var value
+      when: manual    
