@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_vpc" "lab" {
   cidr_block = var.vpc-cidr-block
   enable_dns_hostnames = true
@@ -92,4 +94,30 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table_association" "private" {
   subnet_id      = aws_subnet.private.id
   route_table_id = aws_route_table.private-exteral.id
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_endpoint_type = "Gateway"
+  service_name = "com.amazonaws.us-east-2.s3"
+  vpc_id       = aws_vpc.lab.id
+  # this will manage a route table entry for prefix list (pl-...s3) -> endpoint (vpce-...) 
+  route_table_ids   = [aws_route_table.public-igw.id]
+  policy = <<POLICY
+{
+	"Version": "2008-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "${data.aws_caller_identity.current.arn}"
+			},
+			"Action": "s3:*",
+			"Resource": "*"
+		}
+	]
+}
+POLICY
+  tags = {
+    Name = "${var.project-name}-s3-endpoint"
+  }
 }
