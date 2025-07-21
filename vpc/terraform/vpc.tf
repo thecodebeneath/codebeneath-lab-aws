@@ -27,7 +27,7 @@ resource "aws_subnet" "public" {
   availability_zone       = "us-east-2a"
   map_public_ip_on_launch = true
   tags = {
-    Name = var.project-name
+    Name = "${var.project-name}-public"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "private" {
   cidr_block        = var.private-subnet-cidr-block
   availability_zone = "us-east-2a"
   tags = {
-    Name = var.project-name
+    Name = "${var.project-name}-private"
   }
 }
 
