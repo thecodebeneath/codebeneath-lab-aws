@@ -34,6 +34,16 @@ terraform apply -var-file=codebeneath.tfvars
 terraform destroy -var-file=codebeneath.tfvars
 ```
 
+## Container Registry
+Create image repositories used in the lab
+
+```
+cd ./ecr/terraform
+terraform init
+terraform apply -var-file=codebeneath.tfvars
+terraform destroy -var-file=codebeneath.tfvars
+```
+
 ## Gitlab Instance
 Create a self-hosted gitlab instance in the lab public subnet
 ```
