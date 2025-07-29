@@ -60,14 +60,27 @@ function installDocker() {
   sudo dnf update -y
   sudo dnf install -y docker
 
+  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+      -o /usr/libexec/docker/cli-plugins/docker-compose
+  sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+
   configDocker
   configDockerUser
+}
+
+function gitlabSetup() {
+  mkdir -p /home/ec2-user/gitlab && chown ec2-user:ec2-user /home/ec2-user/gitlab
+  mkdir -p /"$MOUNT_POINT"/gitlab/config
+  mkdir -p /"$MOUNT_POINT"/gitlab/logs
+  mkdir -p /"$MOUNT_POINT"/gitlab/data
+  chown -R ec2-user:ec2-user /"$MOUNT_POINT"/gitlab
 }
 
 function main() {
   echo "codebeneath userdata script starting..."
   mountVolume
   installDocker
+  gitlabSetup
 }
 
 main "$@"

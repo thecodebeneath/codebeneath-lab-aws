@@ -1,0 +1,40 @@
+services:
+  gitlab:
+    container_name: gitlab
+    image: '$ECR_REGISTRY/gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: '$PUBLIC_IP'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # Add any other gitlab.rb configuration here, each on its own line
+        external_url 'http://$PUBLIC_IP'
+      GITLAB_SHARED_RUNNERS_REGISTRATION_TOKEN: "$RUNNER_REG_TOKEN"
+    ports:
+      - '80:80'
+      # - '443:443'
+      # - '22:22'
+    volumes:
+      - '/data/gitlab/config:/etc/gitlab'
+      - '/data/gitlab/logs:/var/log/gitlab'
+      - '/data/gitlab/data:/var/opt/gitlab'
+    shm_size: '256m'
+
+  # This runner image will pull and run specific runner images declared in .gitlab-ci.yml  
+  gitlab-runner:
+    container_name: gitlab-runner
+    depends_on:
+      - gitlab
+    image: '$ECR_REGISTRY/gitlab/gitlab-runner:alpine'
+    entrypoint: [""]
+    command: ["/bin/bash", "-c", "gitlab-runner register \
+                                    --non-interactive \
+                                    --url 'http://gitlab' \
+                                    --registration-token '$RUNNER_REG_TOKEN' \
+                                    --executor 'docker' \
+                                    --docker-image 'python:alpine' \
+                                    --tag-list 'python,tf' \
+              && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"
+    ]
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    shm_size: '64m'
