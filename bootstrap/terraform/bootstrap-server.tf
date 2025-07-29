@@ -1,5 +1,15 @@
+data "aws_vpc" "lab-vpc" {
+    filter {
+      name   = "tag:Name"
+      values = [var.project-name]
+    }
+}
+
 data "aws_subnet" "bootstrap-target" {
-  id = var.public-subnet-id
+    filter {
+      name   = "tag:Name"
+      values = ["${var.project-name}-public"]
+    }
 }
 
 data "aws_ami" "al2023" {
@@ -11,15 +21,16 @@ data "aws_ami" "al2023" {
   }
 }
 
-resource "aws_instance" "bootstrap" {
+resource "aws_instance" "bootstrap-ec2" {
   ami               = var.bootstap-ami != "" ? var.bootstap-ami : data.aws_ami.al2023.id
   instance_type     = var.bootstrap-instance-type
-  subnet_id         = var.public-subnet-id
+  subnet_id         = data.aws_subnet.bootstrap-target.id
   key_name          = var.bootstrap-key-name
   availability_zone = "us-east-2a"
-  vpc_security_group_ids   = [aws_security_group.allow.id]
+  vpc_security_group_ids   = [aws_security_group.bootstrap-sg.id]
   associate_public_ip_address = true
   root_block_device {
+    volume_type = "gp3"
     volume_size = 20
     tags = {
       Name = "${var.project-name}-bootstrap-root"
@@ -39,6 +50,7 @@ resource "aws_instance" "bootstrap" {
 
 resource "aws_ebs_volume" "datavol" {
   availability_zone = data.aws_subnet.bootstrap-target.availability_zone
+  type = "gp3"
   size = 100
   tags = {
     Name = "${var.project-name}-bootstrap-data"
@@ -48,29 +60,21 @@ resource "aws_ebs_volume" "datavol" {
 resource "aws_volume_attachment" "datavol" {
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.datavol.id 
-  instance_id = aws_instance.bootstrap.id
+  instance_id = aws_instance.bootstrap-ec2.id
 }
 
-resource "aws_security_group" "allow" {
-  name        = "${var.project-name}-allow_ssh"
+resource "aws_security_group" "bootstrap-sg" {
+  name        = "${var.project-name}-bootstrap-sg"
   description = "Allow ssh inbound traffic and all outbound traffic"
-  vpc_id      = var.lab-vpc-id
+  vpc_id      = data.aws_vpc.lab-vpc.id
 
   tags = {
-    Name = "${var.project-name}-allow_ssh"
+    Name = "${var.project-name}-bootstrap-sg"
   }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
-#   security_group_id = aws_security_group.allow.id
-#   cidr_ipv4         = "0.0.0.0/0"
-#   from_port         = 80
-#   ip_protocol       = "tcp"
-#   to_port           = 80
-# }
-
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_22" {
-  security_group_id = aws_security_group.allow.id
+  security_group_id = aws_security_group.bootstrap-sg.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
@@ -78,7 +82,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ssh_22" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
-  security_group_id = aws_security_group.allow.id
+  security_group_id = aws_security_group.bootstrap-sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
 }

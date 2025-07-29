@@ -4,18 +4,6 @@ variable project-name {
   description = "A string used for all resource names"
 }
 
-variable lab-vpc-id {
-  type        = string
-  nullable    = false
-  description = "ID block for main vpc"
-}
-
-variable public-subnet-id {
-  type        = string
-  nullable    = false
-  description = "Public subnet ID to use for the bootstrap server"
-}
-
 variable bootstap-ami {
   type        = string
   default     = ""
