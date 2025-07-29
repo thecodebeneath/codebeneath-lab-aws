@@ -60,7 +60,6 @@ resource "aws_nat_gateway" "nat" {
   tags = {
     Name = var.project-name
   }
-
   depends_on = [aws_internet_gateway.igw]
 }
 
@@ -96,7 +95,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private-exteral.id
 }
 
-resource "aws_vpc_endpoint" "s3" {
+resource "aws_vpc_endpoint" "s3-gw" {
   vpc_endpoint_type = "Gateway"
   service_name = "com.amazonaws.us-east-2.s3"
   vpc_id       = aws_vpc.lab.id
@@ -108,9 +107,7 @@ resource "aws_vpc_endpoint" "s3" {
 	"Statement": [
 		{
 			"Effect": "Allow",
-			"Principal": {
-				"AWS": "${data.aws_caller_identity.current.arn}"
-			},
+			"Principal": "*",
 			"Action": "s3:*",
 			"Resource": "*"
 		}
@@ -121,3 +118,48 @@ POLICY
     Name = "${var.project-name}-s3-endpoint"
   }
 }
+
+# resource "aws_security_group" "ecr-sg" {
+#   name        = "${var.project-name}-ecr-sg"
+#   description = "Allow access to ECR"
+#   vpc_id     = aws_vpc.lab.id
+#   ingress {
+#     from_port   = 443
+#     to_port     = 443
+#     protocol    = "tcp"
+#     cidr_blocks = ["10.0.0.0/16"]  # Adjust as necessary
+#   }
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"  # All traffic
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+#   tags = {
+#     Name = "${var.project-name}-ecr-sg"
+#   }
+# }
+
+# resource "aws_vpc_endpoint" "ecr-dkr-endpoint" {
+#   vpc_endpoint_type   = "Interface"
+#   service_name        = "com.amazonaws.us-east-2.ecr.dkr"
+#   vpc_id              = aws_vpc.main.id
+#   private_dns_enabled = true
+#   security_group_ids  = [ aws_security_group.ecr-sg.id ]
+#   subnet_ids          = [ aws_subnet.public.id ]
+#   tags = {
+#     Name = "${var.project-name}-s3-endpoint"
+#   }
+# }
+
+# resource "aws_vpc_endpoint" "ecr-api-endpoint" {
+#   vpc_endpoint_type   = "Interface"
+#   service_name        = "com.amazonaws.us-east-2.ecr.api"
+#   vpc_id              = aws_vpc.main.id
+#   private_dns_enabled = true
+#   security_group_ids  = [ aws_security_group.ecr-sg.id ]
+#   subnet_ids          = [ aws_subnet.public.id ]
+#   tags = {
+#     Name = "${var.project-name}-s3-endpoint"
+#   }
+# }
