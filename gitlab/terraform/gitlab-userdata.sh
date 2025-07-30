@@ -37,7 +37,7 @@ function mountVolume() {
 function configDocker() {
   local docker_data_dir="$MOUNT_POINT/docker"
 
-  sudo systemctl stop docker
+  systemctl stop docker
 
   mkdir -p "$docker_data_dir"
   chmod 710 "$docker_data_dir"
@@ -48,21 +48,21 @@ function configDocker() {
 EOF
   )" > /etc/docker/daemon.json
 
-  sudo systemctl enable --now docker
+  systemctl enable --now docker
 }
 
 function configDockerUser() {
-  sudo usermod -aG docker ec2-user
+  usermod -aG docker ec2-user
   newgrp docker
 }
 
 function installDocker() {
-  sudo dnf update -y
-  sudo dnf install -y docker
+  dnf update -y
+  dnf install -y docker
 
-  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+  curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
       -o /usr/libexec/docker/cli-plugins/docker-compose
-  sudo chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+  chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
   configDocker
   configDockerUser
