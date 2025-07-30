@@ -8,6 +8,7 @@ services:
       GITLAB_OMNIBUS_CONFIG: |
         # Add any other gitlab.rb configuration here, each on its own line
         external_url 'http://$PUBLIC_IP'
+        # gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128'] 
       GITLAB_SHARED_RUNNERS_REGISTRATION_TOKEN: "$RUNNER_REG_TOKEN"
     ports:
       - '80:80'
@@ -18,12 +19,19 @@ services:
       - '/data/gitlab/logs:/var/log/gitlab'
       - '/data/gitlab/data:/var/opt/gitlab'
     shm_size: '256m'
+    healthcheck:
+      test: curl -f http://localhost/users/sign_in || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 2m
 
   # This runner image will pull and run specific runner images declared in .gitlab-ci.yml  
   gitlab-runner:
     container_name: gitlab-runner
     depends_on:
-      - gitlab
+      gitlab:
+        condition: service_healthy
     image: '$ECR_REGISTRY/gitlab/gitlab-runner:alpine'
     entrypoint: [""]
     command: ["/bin/bash", "-c", "gitlab-runner register \
