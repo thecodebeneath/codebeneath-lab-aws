@@ -68,6 +68,11 @@ function installDocker() {
   configDockerUser
 }
 
+function installGit() {
+  dnf update -y
+  dnf install -y git
+}
+
 function gitlabSetup() {
   mkdir -p /home/ec2-user/gitlab && chown ec2-user:ec2-user /home/ec2-user/gitlab
   mkdir -p /"$MOUNT_POINT"/gitlab/config
@@ -80,6 +85,7 @@ function main() {
   echo "codebeneath userdata script starting..."
   mountVolume
   installDocker
+  installGit
   gitlabSetup
 }
 
