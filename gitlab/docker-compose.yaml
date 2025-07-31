@@ -36,13 +36,15 @@ services:
     entrypoint: [""]
     command: ["/bin/bash", "-c", "gitlab-runner register \
                                     --non-interactive \
-                                    --url 'http://gitlab' \
+                                    --url 'http://$PUBLIC_IP' \
                                     --registration-token '$RUNNER_REG_TOKEN' \
                                     --executor 'docker' \
                                     --docker-image 'python:alpine' \
+                                    --docker-network-mode 'host' \
                                     --tag-list 'python,tf' \
               && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"
     ]
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
+    network_mode: 'host'
     shm_size: '64m'
