@@ -52,3 +52,21 @@ terraform init
 terraform apply -var-file=codebeneath.tfvars
 terraform destroy -var-file=codebeneath.tfvars
 ```
+
+## Reverse Engineer IaC
+
+### Terraform native
+Experimental terraform import and HCL generation with the import blocks below.
+Ref: https://developer.hashicorp.com/terraform/language/import/generating-configuration
+```bash
+terraform plan -generate-config-out=generated.tf
+```
+The `generated.tf` content is then copied here and improved.
+
+### Terraformer 
+Terraformer project
+Ref: https://github.com/GoogleCloudPlatform/terraformer
+```bash
+terraformer import aws -r route53
+```
+The generated .tf files are created in `./generated/aws/route53/*.tf`

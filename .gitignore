@@ -41,3 +41,8 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Terraform 'import' block generated code
+generated.tf
+# Terraformer generated code
+generated/
