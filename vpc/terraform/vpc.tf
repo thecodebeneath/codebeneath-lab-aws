@@ -21,13 +21,23 @@ resource "aws_vpc_dhcp_options_association" "dhcp-lab" {
   dhcp_options_id = aws_vpc_dhcp_options.dns-resolver.id
 }
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "lab-public-2a" {
   vpc_id                  = aws_vpc.lab.id
-  cidr_block              = var.public-subnet-cidr-block
+  cidr_block              = var.public-subnet-2a-cidr-block
   availability_zone       = "us-east-2a"
   map_public_ip_on_launch = true
   tags = {
-    Name = "${var.project-name}-public"
+    Name = "${var.project-name}-public-2a"
+  }
+}
+
+resource "aws_subnet" "lab-public-2b" {
+  vpc_id                  = aws_vpc.lab.id
+  cidr_block              = var.public-subnet-2b-cidr-block
+  availability_zone       = "us-east-2b"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "${var.project-name}-public-2b"
   }
 }
 

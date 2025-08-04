@@ -5,21 +5,21 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-resource "aws_eip" "nat" {
-  domain = "vpc"
-  tags = {
-    Name = var.project-name
-  }
-}
+# resource "aws_eip" "nat" {
+#   domain = "vpc"
+#   tags = {
+#     Name = var.project-name
+#   }
+# }
 
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
-  tags = {
-    Name = var.project-name
-  }
-  depends_on = [aws_internet_gateway.igw]
-}
+# resource "aws_nat_gateway" "nat" {
+#   allocation_id = aws_eip.nat.id
+#   subnet_id     = aws_subnet.lab-public-2a.id
+#   tags = {
+#     Name = var.project-name
+#   }
+#   depends_on = [aws_internet_gateway.igw]
+# }
 
 resource "aws_route_table" "public-igw" {
   vpc_id = aws_vpc.lab.id
@@ -44,7 +44,7 @@ resource "aws_route_table" "public-igw" {
 # }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+  subnet_id      = aws_subnet.lab-public-2a.id
   route_table_id = aws_route_table.public-igw.id
 }
 
@@ -104,7 +104,7 @@ POLICY
 #   vpc_id              = aws_vpc.main.id
 #   private_dns_enabled = true
 #   security_group_ids  = [ aws_security_group.ecr-sg.id ]
-#   subnet_ids          = [ aws_subnet.public.id ]
+#   subnet_ids          = [ aws_subnet.lab-public-2a.id ]
 #   tags = {
 #     Name = "${var.project-name}-s3-endpoint"
 #   }
@@ -116,7 +116,7 @@ POLICY
 #   vpc_id              = aws_vpc.main.id
 #   private_dns_enabled = true
 #   security_group_ids  = [ aws_security_group.ecr-sg.id ]
-#   subnet_ids          = [ aws_subnet.public.id ]
+#   subnet_ids          = [ aws_subnet.lab-public-2a.id ]
 #   tags = {
 #     Name = "${var.project-name}-s3-endpoint"
 #   }

@@ -5,10 +5,10 @@ data "aws_vpc" "lab-vpc" {
     }
 }
 
-data "aws_subnet" "bootstrap-target" {
+data "aws_subnet" "bootstrap-subnet" {
     filter {
       name   = "tag:Name"
-      values = ["${var.project-name}-public"]
+      values = ["${var.project-name}-public-2a"]
     }
 }
 
@@ -24,7 +24,7 @@ data "aws_ami" "al2023" {
 resource "aws_instance" "bootstrap-ec2" {
   ami               = var.bootstap-ami != "" ? var.bootstap-ami : data.aws_ami.al2023.id
   instance_type     = var.bootstrap-instance-type
-  subnet_id         = data.aws_subnet.bootstrap-target.id
+  subnet_id         = data.aws_subnet.bootstrap-subnet.id
   key_name          = var.bootstrap-key-name
   availability_zone = "us-east-2a"
   vpc_security_group_ids   = [aws_security_group.bootstrap-sg.id]
@@ -49,7 +49,7 @@ resource "aws_instance" "bootstrap-ec2" {
 }
 
 resource "aws_ebs_volume" "datavol" {
-  availability_zone = data.aws_subnet.bootstrap-target.availability_zone
+  availability_zone = data.aws_subnet.bootstrap-subnet.availability_zone
   type = "gp3"
   size = 100
   tags = {
