@@ -6,12 +6,18 @@ variable lab-zone-name {
 
 variable gitlab-record-name {
   type        = string
-  default     = "gitlab"
+  default     = "gitlab.codebeneath-labs.org"
   description = "Zone record name for the Gitlab instance"
 }
 
-variable lb-dns-name {
+variable alb-dns-name {
   type        = string
   nullable    = false
   description = "Load balancer DNS name for the Gitlab instance"
+}
+
+variable alb-zone-id {
+  type        = string
+  nullable    = false
+  description = "Load balancer hosted zone id for the Gitlab instance"
 }

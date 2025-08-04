@@ -27,12 +27,10 @@ resource "aws_route53_record" "gitlab" {
   zone_id = aws_route53_zone.codebeneath-labs-org.zone_id
   name    = var.gitlab-record-name
   type    = "A"
-  ttl     = 300
-  # records = [ "3.144.95.81" ]
   alias {
-    name                   = aws_elb.main.dns_name
-    zone_id                = aws_elb.main.zone_id
-    evaluate_target_health = true
+    name                   = var.alb-dns-name
+    zone_id                = var.alb-zone-id
+    evaluate_target_health = false
   }
 }
 
