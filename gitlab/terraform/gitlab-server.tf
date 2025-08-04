@@ -5,10 +5,17 @@ data "aws_vpc" "lab-vpc" {
     }
 }
 
-data "aws_subnet" "gitlab-target" {
+data "aws_subnet" "lab-subnet-2a" {
     filter {
       name   = "tag:Name"
-      values = ["${var.project-name}-public"]
+      values = ["${var.project-name}-public-2a"]
+    }
+}
+
+data "aws_subnet" "lab-subnet-2b" {
+    filter {
+      name   = "tag:Name"
+      values = ["${var.project-name}-public-2b"]
     }
 }
 
@@ -24,7 +31,7 @@ data "aws_ami" "al2023" {
 resource "aws_instance" "gitlab-ec2" {
   ami                     = var.gitlab-ami != "" ? var.gitlab-ami : data.aws_ami.al2023.id
   instance_type           = var.gitlab-instance-type
-  subnet_id               = data.aws_subnet.gitlab-target.id
+  subnet_id               = data.aws_subnet.lab-subnet-2a.id
   key_name                = var.gitlab-key-name
   iam_instance_profile    = aws_iam_instance_profile.gitlab-ec2.name
   availability_zone       = "us-east-2a"
@@ -50,7 +57,7 @@ resource "aws_instance" "gitlab-ec2" {
 }
 
 resource "aws_ebs_volume" "datavol" {
-  availability_zone = data.aws_subnet.gitlab-target.availability_zone
+  availability_zone = data.aws_subnet.lab-subnet-2a.availability_zone
   type = "gp3"
   size = 100
   tags = {

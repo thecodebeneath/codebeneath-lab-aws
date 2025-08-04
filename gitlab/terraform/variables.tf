@@ -21,3 +21,9 @@ variable gitlab-key-name {
   nullable    = false
   description = "EC2 keypair to use to ssh into the gitlab server"
 }
+
+variable gitlab-cert-domain {
+  type        = string
+  default     = "*.codebeneath-labs.org"
+  description = "Wildcard domain of the Certificate Manager imported certificate"
+}
