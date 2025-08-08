@@ -6,8 +6,12 @@ services:
     hostname: 'gitlab.codebeneath-labs.org'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        # Add any other gitlab.rb configuration here, each on its own line
-        external_url 'http://gitlab.codebeneath-labs.org'   # 'https://gitlab' triggers letsencrypt 'true'
+        external_url 'https://gitlab.codebeneath-labs.org'
+        # 'https://...' triggers letsencrypt 'true', so disable since we use certs at the LB
+        letsencrypt['enable'] = false
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        # gitlab_rails['gitlab_signup_enabled'] = false
         # gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128'] 
       GITLAB_SHARED_RUNNERS_REGISTRATION_TOKEN: "$RUNNER_REG_TOKEN"
     ports:
@@ -26,25 +30,32 @@ services:
       retries: 5
       start_period: 2m
 
-  # This runner image will pull and run specific runner images declared in .gitlab-ci.yml  
-  gitlab-runner:
-    container_name: gitlab-runner
-    depends_on:
-      gitlab:
-        condition: service_healthy
-    image: '$ECR_REGISTRY/gitlab/gitlab-runner:alpine'
-    entrypoint: [""]
-    command: ["/bin/bash", "-c", "gitlab-runner register \
-                                    --non-interactive \
-                                    --url 'http://gitlab.codebeneath-labs.org' \
-                                    --registration-token '$RUNNER_REG_TOKEN' \
-                                    --executor 'docker' \
-                                    --docker-image 'python:alpine' \
-                                    --docker-network-mode 'host' \
-                                    --tag-list 'python,tf' \
-              && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"
-    ]
-    volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
-    network_mode: 'host'
-    shm_size: '64m'
+  # This runner image will pull and run specific runner images declared in .gitlab-ci.yml
+  #
+  # > Note: Can't get this runner image to work with the ECR credential helper.
+  #
+  # gitlab-runner:
+  #   container_name: gitlab-runner
+  #   depends_on:
+  #     gitlab:
+  #       condition: service_healthy
+  #   image: '$ECR_REGISTRY/codebeneath/gitlab/gitlab-runner-ecr-helper:1.0'
+  #   entrypoint: [""]
+  #   environment:
+  #     DOCKER_AUTH_CONFIG: '{ "credsStore": "ecr-login" }'
+  #   command: ["/bin/bash", "-c", "gitlab-runner register \
+  #                                   --non-interactive \
+  #                                   --url 'https://gitlab.codebeneath-labs.org' \
+  #                                   --registration-token '$RUNNER_REG_TOKEN' \
+  #                                   --executor 'docker' \
+  #                                   --docker-image 'python:alpine' \
+  #                                   --docker-network-mode 'host' \
+  #                                   --tag-list 'python,tf' \
+  #                                   --env DOCKER_AUTH_CONFIG='{ \"credsStore\": \"ecr-login\" }' \
+  #             && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"
+  #   ]
+  #   volumes:
+  #     - '/var/run/docker.sock:/var/run/docker.sock'
+  #     - '/usr/bin/docker:/usr/bin/docker'
+  #   network_mode: 'host'
+  #   shm_size: '64m'

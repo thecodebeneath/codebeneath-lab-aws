@@ -1,3 +1,12 @@
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_openid_connect_provider" "gitlab-oidc" {
+  url = "https://gitlab.codebeneath-labs.org"
+  client_id_list = [
+    "https://gitlab.codebeneath-labs.org",
+  ]
+}
+
 resource "aws_iam_role" "gitlab-ec2-role" {
   name = "${var.project-name}-gitlab-ec2-role"
   assume_role_policy = jsonencode({
@@ -6,7 +15,7 @@ resource "aws_iam_role" "gitlab-ec2-role" {
       Action = "sts:AssumeRole"
       Principal = {
         Service = "ec2.amazonaws.com"
-      }
+        }
       Effect = "Allow"
     }]
   })
@@ -69,4 +78,63 @@ resource "aws_iam_instance_profile" "gitlab-ec2" {
   tags = {
     Name = "${var.project-name}-gitlab-ec2"
   }
+}
+
+# ---
+
+resource "aws_iam_role" "gitlab-runner-role" {
+  name = "${var.project-name}-gitlab-runner-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/gitlab.codebeneath-labs.org"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "gitlab.codebeneath-labs.org:sub": "project_path:codebeneath/tf:ref_type:branch:ref:main"
+        }
+      }
+    }]
+  })
+  tags = {
+    Name = "${var.project-name}-gitlab-runner-role"
+  }
+}
+
+resource "aws_iam_policy" "gitlab-runner-policy" {
+  name        = "${var.project-name}-gitlab-runner-policy"
+  description = "Policy to allow Gitlab runner to create terraform resources"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetAuthorizationToken",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Resource = "*"
+      },
+    ]
+  })
+  tags = {
+    Name = "${var.project-name}-gitlab-runner-policy"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "gitlab-runner-attach" {
+  policy_arn = aws_iam_policy.gitlab-runner-policy.arn
+  role       = aws_iam_role.gitlab-runner-role.name
 }

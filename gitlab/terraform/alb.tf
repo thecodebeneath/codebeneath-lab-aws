@@ -37,9 +37,18 @@ resource "aws_lb_listener" "port-80" {
   }
 }
 
-# resource "aws_lb_listener" "port-443" {
-#   # ...
-# }
+resource "aws_lb_listener" "port-443" {
+  load_balancer_arn = aws_lb.gitlab-alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.codebeneath-labs-org.arn
+  routing_http_response_server_enabled = "true"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.gitlab-server.arn
+  }
+}
 
 # resource "aws_lb_listener_certificate" "gitlab-listener-cert" {
 #   listener_arn    = aws_lb_listener.port-443.arn

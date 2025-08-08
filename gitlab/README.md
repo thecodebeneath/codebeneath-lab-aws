@@ -45,6 +45,32 @@ docker compose exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_passwor
 
 # Runners
 
+## Host-based Runner
+Makes use of the Amazon ECR Credential Helper (`docker-credential-ecr-login`) to use EC2 instance role for Docker login to ECR.
+
+```
+sudo curl -L --output /usr/local/bin/gitlab-runner "https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runner-downloads/latest/binaries/gitlab-runner-linux-amd64"
+
+sudo chmod +x /usr/local/bin/gitlab-runner
+```
+
+As Gitlab root user: Admin > CI > Runners > Create Runner > Save
+
+Then copy the provided token value for use in the next command:
+```
+sudo gitlab-runner register \
+    --non-interactive \
+    --url 'https://gitlab.codebeneath-labs.org' \
+    --token glrt-93VQhUEuqFJ7ApkUVPJvR286MQp0OjEKdToxCw.01.121r35qvu \
+    --executor 'docker' \
+    --docker-image 'python:alpine' \
+    --docker-network-mode 'host' \
+    --env DOCKER_AUTH_CONFIG='{ "credsStore": "ecr-login" }'
+	
+sudo gitlab-runner run
+
+```
+
 ## Docker Runner (and dynamic, nested job runner) 
 A single Gitlab runner, running as a docker container, will register itself with the gitlab server using a registration token. The token is randomly generated and injected into the docker-compose.yml file.
 
