@@ -22,11 +22,12 @@ data "aws_ami" "al2023" {
 }
 
 resource "aws_instance" "bootstrap-ec2" {
-  ami               = var.bootstap-ami != "" ? var.bootstap-ami : data.aws_ami.al2023.id
-  instance_type     = var.bootstrap-instance-type
-  subnet_id         = data.aws_subnet.bootstrap-subnet.id
-  key_name          = var.bootstrap-key-name
-  availability_zone = "us-east-2a"
+  ami                      = var.bootstap-ami != "" ? var.bootstap-ami : data.aws_ami.al2023.id
+  instance_type            = var.bootstrap-instance-type
+  subnet_id                = data.aws_subnet.bootstrap-subnet.id
+  key_name                 = var.bootstrap-key-name
+  iam_instance_profile     = aws_iam_instance_profile.bootstrap-ec2.name
+  availability_zone        = "us-east-2a"
   vpc_security_group_ids   = [aws_security_group.bootstrap-sg.id]
   associate_public_ip_address = true
   root_block_device {
