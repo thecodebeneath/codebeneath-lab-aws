@@ -13,7 +13,7 @@ Update domain name registrar to use AWS hosted zone nameservers (4x)
 
 ## Server Certificate
 Use Let's Encrypt to issue a wildcard cert for `*.codebeneath-labs.com`
-Install Certbot, then follow these steps:
+Install Certbot and the Route53 plugin, (Ref: https://certbot-dns-route53.readthedocs.io/en/stable/) then follow these steps:
 
 ```
 aws sts get-session-token --duration-seconds 900
