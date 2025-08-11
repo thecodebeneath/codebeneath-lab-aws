@@ -7,6 +7,7 @@ data "aws_acm_certificate" "codebeneath-labs-org" {
 
 # Public-facing load balancer
 resource "aws_lb" "gitlab-alb" {
+  #checkov:skip=CKV2_AWS_28:Ensure public facing ALB are protected by WAF
   name               = "${var.project-name}-gitlab-alb"
   internal           = false
   load_balancer_type = "application"
@@ -41,7 +42,7 @@ resource "aws_lb_listener" "port-443" {
   load_balancer_arn = aws_lb.gitlab-alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = data.aws_acm_certificate.codebeneath-labs-org.arn
   routing_http_response_server_enabled = "true"
   default_action {

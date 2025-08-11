@@ -1,6 +1,6 @@
-output gitlab-public-ip {
-  value = aws_instance.gitlab-ec2.public_ip
-  description = "The public IP of the bootstrap EC2 instance"
+output gitlab-public-eip {
+    value = aws_eip.gitlab-eip.public_ip
+    description = "The public IP of the gitlab EC2 instance"
 }
 
 output bootstrap-ami-id {

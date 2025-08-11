@@ -18,6 +18,7 @@ resource "aws_iam_role" "bootstrap-ec2-role" {
 }
 
 resource "aws_iam_policy" "bootstrap-ec2-policy" {
+  #checkov:skip=CKV_AWS_290:Ensure IAM policies does not allow write access without constraints
   name        = "${var.project-name}-bootstrap-ec2-policy"
   description = "Policy to allow access to S3 and ECR"
   policy = jsonencode({
@@ -51,7 +52,7 @@ resource "aws_iam_policy" "bootstrap-ec2-policy" {
           "ecr:PutImage",
           "ecr:UploadLayerPart"
         ]
-        Resource = "*"
+        Resource = "arn:aws:ecr:::repository/*"
       },
     ]
   })

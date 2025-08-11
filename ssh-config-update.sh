@@ -5,7 +5,7 @@ set -e
 HOST_ALIAS=$1
 SSH_CONFIG="/mnt/c/Users/Trivi/.ssh/config"
 HOST_ENTRY="Host $HOST_ALIAS"
-NEW_HOSTNAME=$(terraform output -raw "$HOST_ALIAS-public-ip")
+NEW_HOSTNAME=$(terraform output -raw "$HOST_ALIAS-public-eip")
 
 # Check if the SSH config file exists
 if [[ ! -f "$SSH_CONFIG" ]]; then

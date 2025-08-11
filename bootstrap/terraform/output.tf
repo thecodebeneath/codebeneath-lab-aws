@@ -1,5 +1,5 @@
-output bootstrap-public-ip {
-    value = aws_instance.bootstrap-ec2.public_ip
+output bootstrap-public-eip {
+    value = aws_eip.bootstrap-eip.public_ip
     description = "The public IP of the bootstrap EC2 instance"
 }
 

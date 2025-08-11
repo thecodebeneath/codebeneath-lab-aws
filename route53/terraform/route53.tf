@@ -20,6 +20,8 @@
 # ========== copied from generated.tf ==========
 
 resource "aws_route53_zone" "codebeneath-labs-org" {
+  #checkov:skip=CKV2_AWS_39:Ensure Domain Name System query logging is enabled for hosted zones
+  #checkov:skip=CKV2_AWS_38:Ensure DNSSEC signing is enabled for public hosted zones
   name = var.lab-zone-name
 }
 

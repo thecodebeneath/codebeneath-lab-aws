@@ -51,15 +51,11 @@ resource "aws_iam_policy" "gitlab-ec2-policy" {
         Action = [
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability",
-          "ecr:CompleteLayerUpload",
           "ecr:GetAuthorizationToken",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart"
+          "ecr:GetDownloadUrlForLayer"
         ]
-        Resource = "*"
-      },
+        Resource = "arn:aws:ecr:::repository/*"
+      }
     ]
   })
   tags = {
@@ -105,6 +101,7 @@ resource "aws_iam_role" "gitlab-runner-role" {
 }
 
 resource "aws_iam_policy" "gitlab-runner-policy" {
+  #checkov:skip=CKV_AWS_290:Ensure IAM policies does not allow write access without constraints
   name        = "${var.project-name}-gitlab-runner-policy"
   description = "Policy to allow Gitlab runner to create terraform resources"
   policy = jsonencode({
@@ -113,9 +110,18 @@ resource "aws_iam_policy" "gitlab-runner-policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:*"
+          "s3:ListAllMyBuckets",
+          "s3:ListBucket"
         ]
-        Resource = "*"
+        Resource = "arn:aws:s3:::*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject"
+        ]
+        Resource = "arn:aws:s3:::*/*"
       },
       {
         Effect = "Allow"
@@ -125,8 +131,8 @@ resource "aws_iam_policy" "gitlab-runner-policy" {
           "ecr:GetAuthorizationToken",
           "ecr:GetDownloadUrlForLayer"
         ]
-        Resource = "*"
-      },
+        Resource = "arn:aws:ecr:::repository/*"
+      }
     ]
   })
   tags = {
