@@ -51,9 +51,8 @@ EOF
   systemctl enable --now docker
 }
 
-function configDockerUser() {
-  usermod -aG docker ec2-user
-  newgrp docker
+function installEcrCredentialHelper() {
+  dnf install -y amazon-ecr-credential-helper
 }
 
 function installDocker() {
@@ -65,7 +64,7 @@ function installDocker() {
   chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
   configDocker
-  configDockerUser
+  installEcrCredentialHelper
 }
 
 function installGit() {
@@ -73,7 +72,7 @@ function installGit() {
   dnf install -y git
 }
 
-function gitlabSetup() {
+function gitlabServerSetup() {
   mkdir -p /home/ec2-user/gitlab && chown ec2-user:ec2-user /home/ec2-user/gitlab
   mkdir -p /"$MOUNT_POINT"/gitlab/config
   mkdir -p /"$MOUNT_POINT"/gitlab/logs
@@ -81,12 +80,35 @@ function gitlabSetup() {
   chown -R ec2-user:ec2-user /"$MOUNT_POINT"/gitlab
 }
 
+function gitlabRunnerSetup() {
+  curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | sudo bash
+
+  # install as a service, and create user 'gitlab-runner' in /home/gitlab-runner
+  dnf install -y gitlab-runner
+}
+
+function configDockerUsers() {
+  usermod -aG docker ec2-user
+  usermod -aG docker gitlab-runner
+  newgrp docker
+
+  # git config --global user.email "jeff@jeff.jeff"
+  # git config --global user.name "jeff"
+
+  mkdir -p /root/.docker
+  printf '{"credsStore":"ecr-login"}\n' > /root/.docker/config.json
+  mkdir -p /root/.aws
+  printf "[default]\nregion = us-east-2\n" > /root/.aws/config
+}
+
 function main() {
   echo "codebeneath userdata script starting..."
   mountVolume
   installDocker
   installGit
-  gitlabSetup
+  gitlabServerSetup
+  gitlabRunnerSetup
+  configDockerUsers
 }
 
 main "$@"

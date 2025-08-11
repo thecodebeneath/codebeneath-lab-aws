@@ -1,5 +1,6 @@
 # Prerequisites
 
+Docker images available in ECR repos
 ```bash
 export ECR_REGISTRY="$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.us-east-2.amazonaws.com"
 aws ecr get-login-password | docker login -u AWS --password-stdin "https://$ECR_REGISTRY"
@@ -21,17 +22,13 @@ docker push "$ECR_REGISTRY"/gitlab/gitlab-runner:alpine
 # docker push "$ECR_REGISTRY"/hashicorp/terraform
 ```
 
-# Start Gitlab on public IP of the host
+# Start Gitlab Server with Docker Compose
 
 ```bash
 export ECR_REGISTRY="$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.us-east-2.amazonaws.com"
 aws ecr get-login-password | docker login -u AWS --password-stdin "https://$ECR_REGISTRY"
 
-export TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-export PUBLIC_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
-export ECR_REGISTRY="$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.us-east-2.amazonaws.com"
-export RUNNER_REG_TOKEN=$(echo $RANDOM | md5sum | head -c 20)
-
+cd ~/gitlab
 Copy the "docker-compose.yaml" file here...
 
 docker compose up -d
@@ -46,29 +43,21 @@ docker compose exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_passwor
 # Runners
 
 ## Host-based Runner
-Makes use of the Amazon ECR Credential Helper (`docker-credential-ecr-login`) to use EC2 instance role for Docker login to ECR.
+Install the Gitlab runner as a service and make use of the Amazon ECR Credential Helper (`docker-credential-ecr-login`) to use EC2 instance role for Docker login to ECR.
 
-```
-sudo curl -L --output /usr/local/bin/gitlab-runner "https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runner-downloads/latest/binaries/gitlab-runner-linux-amd64"
+As Gitlab root user, create a personal access token:
+- Administrator > Edit profile > Access tokens > Add new token
+  - Token name: runner-token
+  - Scopes: create_runner, manage_runner
+- Create token
+- Copy token
 
-sudo chmod +x /usr/local/bin/gitlab-runner
-```
+```bash
+cd ~/gitlab
+Copy the "register-gitlab-runner.sh" file here...
 
-As Gitlab root user: Admin > CI > Runners > Create Runner > Save
-
-Then copy the provided token value for use in the next command:
-```
-sudo gitlab-runner register \
-    --non-interactive \
-    --url 'https://gitlab.codebeneath-labs.org' \
-    --token glrt-93VQhUEuqFJ7ApkUVPJvR286MQp0OjEKdToxCw.01.121r35qvu \
-    --executor 'docker' \
-    --docker-image 'python:alpine' \
-    --docker-network-mode 'host' \
-    --env DOCKER_AUTH_CONFIG='{ "credsStore": "ecr-login" }'
-	
-sudo gitlab-runner run
-
+export GITLAB_ACCESS_TOKEN="<ACCESSTOKEN>"
+./register-gitlab-runner.sh
 ```
 
 ## Docker Runner (and dynamic, nested job runner) 
@@ -76,7 +65,7 @@ A single Gitlab runner, running as a docker container, will register itself with
 
 > The registration token method is deprecated and is now replaced with using a personal access token (root) during runner registration.
 
-# Stop Gitlab
+# Stop Gitlab Server with Docker Compose
 ```bash
 docker compose down
 ```
