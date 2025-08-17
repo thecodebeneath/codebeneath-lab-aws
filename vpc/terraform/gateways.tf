@@ -43,8 +43,13 @@ resource "aws_route_table" "public-igw" {
 #   }
 # }
 
-resource "aws_route_table_association" "public" {
+resource "aws_route_table_association" "public-2a" {
   subnet_id      = aws_subnet.lab-public-2a.id
+  route_table_id = aws_route_table.public-igw.id
+}
+
+resource "aws_route_table_association" "public-2b" {
+  subnet_id      = aws_subnet.lab-public-2b.id
   route_table_id = aws_route_table.public-igw.id
 }
 
