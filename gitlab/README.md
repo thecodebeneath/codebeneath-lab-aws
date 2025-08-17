@@ -35,6 +35,13 @@ docker compose up -d
 docker compose ps
 ```
 
+# OIDC Provider
+The Gitlab runner uses OIDC identity provider permissions to assume a specific Gitlab runner IAM role.
+```
+cd ./gitlab/oidc-provider/terraform
+terraform apply -var-file=codebeneath.tfvars
+```
+
 # Usage
 ```bash
 docker compose exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password

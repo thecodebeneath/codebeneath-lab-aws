@@ -1,12 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_iam_openid_connect_provider" "gitlab-oidc" {
-  url = "https://gitlab.codebeneath-labs.org"
-  client_id_list = [
-    "https://gitlab.codebeneath-labs.org",
-  ]
-}
-
 resource "aws_iam_role" "gitlab-ec2-role" {
   name = "${var.project-name}-gitlab-ec2-role"
   assume_role_policy = jsonencode({
@@ -51,10 +44,17 @@ resource "aws_iam_policy" "gitlab-ec2-policy" {
         Action = [
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability",
-          "ecr:GetAuthorizationToken",
           "ecr:GetDownloadUrlForLayer"
         ]
-        Resource = "arn:aws:ecr:::repository/*"
+        Resource = "arn:aws:ecr:*:${data.aws_caller_identity.current.account_id}:repository/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:DescribeRegistry",
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -110,28 +110,26 @@ resource "aws_iam_policy" "gitlab-runner-policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:ListAllMyBuckets",
-          "s3:ListBucket"
+          "s3:*"
         ]
         Resource = "arn:aws:s3:::*"
       },
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObject",
-          "s3:PutObject"
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer"
         ]
-        Resource = "arn:aws:s3:::*/*"
+        Resource = "arn:aws:ecr:*:${data.aws_caller_identity.current.account_id}:repository/*"
       },
       {
         Effect = "Allow"
         Action = [
-          "ecr:BatchGetImage",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetAuthorizationToken",
-          "ecr:GetDownloadUrlForLayer"
+          "ecr:DescribeRegistry",
+          "ecr:GetAuthorizationToken"
         ]
-        Resource = "arn:aws:ecr:::repository/*"
+        Resource = "*"
       }
     ]
   })
