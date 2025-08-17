@@ -46,14 +46,21 @@ resource "aws_iam_policy" "bootstrap-ec2-policy" {
           "ecr:BatchGetImage",
           "ecr:BatchCheckLayerAvailability",
           "ecr:CompleteLayerUpload",
-          "ecr:GetAuthorizationToken",
           "ecr:GetDownloadUrlForLayer",
           "ecr:InitiateLayerUpload",
           "ecr:PutImage",
           "ecr:UploadLayerPart"
         ]
-        Resource = "arn:aws:ecr:::repository/*"
+        Resource = "arn:aws:ecr:*:${data.aws_caller_identity.current.account_id}:repository/*"
       },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:DescribeRegistry",
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      }
     ]
   })
   tags = {
