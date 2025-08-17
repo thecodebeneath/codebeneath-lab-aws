@@ -19,6 +19,10 @@
 
 # ========== copied from generated.tf ==========
 
+data "aws_lb" "gitlab-alb" {
+  name = var.gitlab-alb-name
+}
+
 resource "aws_route53_zone" "codebeneath-labs-org" {
   #checkov:skip=CKV2_AWS_39:Ensure Domain Name System query logging is enabled for hosted zones
   #checkov:skip=CKV2_AWS_38:Ensure DNSSEC signing is enabled for public hosted zones
@@ -30,14 +34,8 @@ resource "aws_route53_record" "gitlab" {
   name    = var.gitlab-record-name
   type    = "A"
   alias {
-    name                   = var.alb-dns-name
-    zone_id                = var.alb-zone-id
+    name                   = data.aws_lb.gitlab-alb.dns_name
+    zone_id                = data.aws_lb.gitlab-alb.zone_id
     evaluate_target_health = false
   }
 }
-
-# resource "aws_acm_certificate" "wildcard-codebeneath-labs-org" {
-#   private_key       = file("./ssh/privkey1.pem")
-#   certificate_body  = file("./ssh/cert1.pem")
-#   certificate_chain = file("./ssh/chain1.pem")
-# }

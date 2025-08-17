@@ -10,14 +10,8 @@ variable gitlab-record-name {
   description = "Zone record name for the Gitlab instance"
 }
 
-variable alb-dns-name {
+variable gitlab-alb-name {
   type        = string
   nullable    = false
-  description = "Load balancer DNS name for the Gitlab instance"
-}
-
-variable alb-zone-id {
-  type        = string
-  nullable    = false
-  description = "Load balancer hosted zone id for the Gitlab instance"
+  description = "Load balancer name for the Gitlab instance"
 }
