@@ -1,4 +1,4 @@
 output lab-vpc {
-    value = aws_vpc.lab.id
+    value = module.codebeneath-aws.lab-vpc
     description = "The id of the lab vpc"
 }

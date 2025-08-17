@@ -12,12 +12,29 @@ Terraform to standup the Codebeneath lab AWS resources
 All AWS resources for the lab are managed by Terraform.
 
 ### VPC
-Create the lab base networking resources
+Create the lab base networking resources.
+> As an example multi-environment module, resources can be created in `aws` or a `localstack` environment.
+
+#### AWS Environment
 ```
 cd ./vpc/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+terraform -chdir=./env/aws init
+terraform -chdir=./env/aws apply -var-file=codebeneath.tfvars
+
+aws ec2 describe-vpc-endpoints
+terraform -chdir=./env/aws destroy -var-file=codebeneath.tfvars
+```
+
+#### Localstack Environment
+```
+cd ./vpc/terraform
+docker compose -f ./env/localstack/docker-compose.yaml up -d
+terraform -chdir=./env/localstack init
+terraform -chdir=./env/localstack apply -var-file=localstack.tfvars
+
+aws ec2 describe-vpc-endpoints --endpoint-url http://localhost:4566
+terraform -chdir=./env/localstack destroy -var-file=localstack.tfvars
+docker compose -f ./env/localstack/docker-compose.yaml down
 ```
 
 ### Bootstrap Server
@@ -57,6 +74,13 @@ terraform destroy -var-file=codebeneath.tfvars
 Create a self-hosted gitlab instance in the lab public subnet
 ```
 cd ./gitlab/terraform
+terraform init
+terraform apply -var-file=codebeneath.tfvars
+terraform destroy -var-file=codebeneath.tfvars
+
+<manual docker compose steps>
+
+cd ./gitlab/oidc-provider/terraform
 terraform init
 terraform apply -var-file=codebeneath.tfvars
 terraform destroy -var-file=codebeneath.tfvars
