@@ -21,6 +21,14 @@ data "aws_ami" "al2023" {
   }
 }
 
+data "http" "workstation-ip" {
+  url = "https://ifconfig.me/ip"
+}
+
+locals {
+  workstation-ip = data.http.workstation-ip.response_body
+}
+
 resource "aws_instance" "bootstrap-ec2" {
   #checkov:skip=CKV_AWS_126:Ensure that detailed monitoring is enabled for EC2 instances
   #checkov:skip=CKV_AWS_135:Ensure that EC2 is EBS optimized
@@ -92,7 +100,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ssh_22" {
   #checkov:skip=CKV_AWS_24:Ensure no security groups allow ingress from 0.0.0.0:0 to port 22
   description = "Allow inbound ssh traffic to the Lab VPC bootstrap server"
   security_group_id = aws_security_group.bootstrap-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "${local.workstation-ip}/32"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22

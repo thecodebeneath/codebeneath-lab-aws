@@ -28,6 +28,14 @@ data "aws_ami" "al2023" {
   }
 }
 
+data "http" "workstation-ip" {
+  url = "https://ifconfig.me/ip"
+}
+
+locals {
+  workstation-ip = data.http.workstation-ip.response_body
+}
+
 resource "aws_instance" "gitlab-ec2" {
   #checkov:skip=CKV_AWS_126:Ensure that detailed monitoring is enabled for EC2 instances
   #checkov:skip=CKV_AWS_135:Ensure that EC2 is EBS optimized
@@ -98,7 +106,7 @@ resource "aws_security_group" "gitlab-sg" {
 resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
   description = "Allow inbound http traffic to the Lab VPC gitlab server"
   security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "${local.workstation-ip}/32"
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
@@ -107,7 +115,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
 resource "aws_vpc_security_group_ingress_rule" "allow_https_443" {
   description = "Allow inbound https traffic to the Lab VPC gitlab server"
   security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "${local.workstation-ip}/32"
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
@@ -117,7 +125,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ssh_22" {
   #checkov:skip=CKV_AWS_24:Ensure no security groups allow ingress from 0.0.0.0:0 to port 22
   description = "Allow inbound ssh traffic to the Lab VPC gitlab server"
   security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "${local.workstation-ip}/32"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22

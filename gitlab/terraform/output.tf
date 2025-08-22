@@ -17,3 +17,8 @@ output alb-zone-id {
   value = aws_lb.gitlab-alb.zone_id
   description = "The ALB dns name that Route53 should use for the gitlab record"
 }
+
+output workstation-ip {
+  value = local.workstation-ip
+  description = "The workstation IP to use for AWS security groups"
+}
