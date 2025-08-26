@@ -12,8 +12,37 @@ services:
         nginx['listen_port'] = 80
         nginx['listen_https'] = false
         # gitlab_rails['gitlab_signup_enabled'] = false
-        # gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128'] 
-      # GITLAB_SHARED_RUNNERS_REGISTRATION_TOKEN: "$RUNNER_REG_TOKEN"
+        # gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '::1/128']
+        # AWS Cognito integration
+        gitlab_rails['omniauth_enabled'] = true
+        gitlab_rails['omniauth_allow_single_sign_on'] = ['cognito']
+        gitlab_rails['omniauth_block_auto_created_users'] = false
+        gitlab_rails['omniauth_external_providers'] = ['cognito']
+        gitlab_rails['omniauth_providers'] = [
+          {
+            name: "cognito",
+            label: "Codebeneath Cognito", # optional label for login button, defaults to "Cognito"
+            icon: nil,
+            app_id: "$OAUTH_CLIENT_ID",
+            app_secret: "$OAUTH_CLIENT_SECRET",
+            args: {
+              scope: "openid email profile",
+              client_options: {
+                site: "https://$COGNITO_CLIENT_DOMAIN.auth.us-east-2.amazoncognito.com",
+                authorize_url: "/oauth2/authorize",
+                token_url: "/oauth2/token",
+                user_info_url: "/oauth2/userInfo"
+              },
+              user_response_structure: {
+                root_path: [],
+                id_path: ["sub"],
+                attributes: { nickname: "email", name: "email", email: "email" }
+              },
+              name: "cognito",
+              strategy_class: "OmniAuth::Strategies::OAuth2Generic"
+            }
+          }
+        ]
     ports:
       - '80:80'
       # - '443:443'
