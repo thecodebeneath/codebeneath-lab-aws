@@ -106,7 +106,7 @@ resource "aws_security_group" "gitlab-sg" {
 resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
   description = "Allow inbound http traffic to the Lab VPC gitlab server"
   security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "${local.workstation-ip}/32"
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
@@ -115,7 +115,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
 resource "aws_vpc_security_group_ingress_rule" "allow_https_443" {
   description = "Allow inbound https traffic to the Lab VPC gitlab server"
   security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "${local.workstation-ip}/32"
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443

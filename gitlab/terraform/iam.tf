@@ -1,5 +1,9 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_iam_policy" "AmazonCognitoReadOnly" {
+  arn = "arn:aws:iam::aws:policy/AmazonCognitoReadOnly"
+}
+
 resource "aws_iam_role" "gitlab-ec2-role" {
   name = "${var.project-name}-gitlab-ec2-role"
   assume_role_policy = jsonencode({
@@ -65,6 +69,11 @@ resource "aws_iam_policy" "gitlab-ec2-policy" {
 
 resource "aws_iam_role_policy_attachment" "gitlab-ec2-attach" {
   policy_arn = aws_iam_policy.gitlab-ec2-policy.arn
+  role       = aws_iam_role.gitlab-ec2-role.name
+}
+
+resource "aws_iam_role_policy_attachment" "gitlab-ec2-cognito-attach" {
+  policy_arn = data.aws_iam_policy.AmazonCognitoReadOnly.arn
   role       = aws_iam_role.gitlab-ec2-role.name
 }
 
