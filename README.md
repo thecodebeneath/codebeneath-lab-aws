@@ -1,6 +1,6 @@
 # Codebeneath AWS Lab
 
-Terraform to standup the Codebeneath lab AWS resources
+OpenTofu/Terraform to standup the Codebeneath lab AWS resources
 
 # Table of Contents
 1. [AWS Resources](#aws-resources)
@@ -9,7 +9,7 @@ Terraform to standup the Codebeneath lab AWS resources
 
 ## AWS Resources
 
-All AWS resources for the lab are managed by Terraform.
+All AWS resources for the lab are managed by OpenTofu.
 
 ### VPC
 Create the lab base networking resources.
@@ -18,22 +18,22 @@ Create the lab base networking resources.
 #### AWS Environment
 ```
 cd ./vpc/terraform
-terraform -chdir=./env/aws init
-terraform -chdir=./env/aws apply -var-file=codebeneath.tfvars
+tofu -chdir=./env/aws init -upgrade
+tofu -chdir=./env/aws apply -var-file=codebeneath.tfvars
 
 aws ec2 describe-vpc-endpoints
-terraform -chdir=./env/aws destroy -var-file=codebeneath.tfvars
+tofu -chdir=./env/aws destroy -var-file=codebeneath.tfvars
 ```
 
 #### Localstack Environment
 ```
 cd ./vpc/terraform
 docker compose -f ./env/localstack/docker-compose.yaml up -d
-terraform -chdir=./env/localstack init
-terraform -chdir=./env/localstack apply -var-file=localstack.tfvars
+tofu -chdir=./env/localstack init -upgrade
+tofu -chdir=./env/localstack apply -var-file=localstack.tfvars
 
 aws ec2 describe-vpc-endpoints --endpoint-url http://localhost:4566
-terraform -chdir=./env/localstack destroy -var-file=localstack.tfvars
+tofu -chdir=./env/localstack destroy -var-file=localstack.tfvars
 docker compose -f ./env/localstack/docker-compose.yaml down
 ```
 
@@ -41,9 +41,9 @@ docker compose -f ./env/localstack/docker-compose.yaml down
 Create the Bootstrap EC2 server with Docker and extra /data volume
 ```
 cd ./bootstrap/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
 ```
 
 ### VPN
@@ -55,9 +55,9 @@ Reference for VPC setup and custom CA: [AWS Client VPN](https://medium.com/@rish
 
 ```
 cd ./vpn/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
 ```
 
 ### Container Registry
@@ -65,25 +65,30 @@ Create image repositories used in the lab
 
 ```
 cd ./ecr/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
 ```
 
 ### Gitlab Instance
 Create a self-hosted gitlab instance in the lab public subnet
 ```
 cd ./gitlab/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
 
 <manual docker compose steps>
 
 cd ./gitlab/oidc-provider/terraform
-terraform init
-terraform apply -var-file=codebeneath.tfvars
-terraform destroy -var-file=codebeneath.tfvars
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
+
+cd ./route53/terraform
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
 ```
 
 ## Security, Policy and Linting Scans
@@ -92,8 +97,8 @@ Checkov scans:
 cd to a ./terraform folder
 docker run -t --rm -v $(pwd):/tf --workdir /tf bridgecrew/checkov --directory /tf
 
-terraform plan -var-file=codebeneath.tfvars -out tfplan.bin
-terraform show -json tfplan.bin | jq > tfplan.json
+tofu plan -var-file=codebeneath.tfvars -out tfplan.bin
+tofu show -json tfplan.bin | jq > tfplan.json
 docker run -t --rm -v $(pwd):/tf --workdir /tf bridgecrew/checkov -f tfplan.json
 ```
 
@@ -101,6 +106,13 @@ tflint scans
 ```
 cd to a ./terraform folder
 docker run -t --rm -v $(pwd):/data --entrypoint "/bin/sh" ghcr.io/terraform-linters/tflint -c "tflint --init && tflint"
+```
+
+SBOM reports
+```
+tofu plan -var-file=codebeneath.tfvars -out tfplan.bin && tofu show -json tfplan.bin | jq > tfplan.json
+
+docker run -t --rm -v $(pwd):/app aquasec/trivy config --format cyclonedx --output /app/sbom.cdx.json /app/tfplan.json
 ```
 
 ## Reverse Engineer IaC

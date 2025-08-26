@@ -15,7 +15,8 @@ resource "aws_resourcegroups_group" "lab-group" {
     "AWS::ElasticLoadBalancingV2::LoadBalancer",
     "AWS::Route53::HostedZone",
     "AWS::CertificateManager::Certificate",
-    "AWS::ECR::Repository"
+    "AWS::ECR::Repository",
+    "AWS::Cognito::UserPool"
   ],
   "TagFilters": [
     {
