@@ -13,7 +13,7 @@ resource "aws_lb" "gitlab-alb" {
   load_balancer_type = "application"
   ip_address_type    = "ipv4"
   subnets            = [ data.aws_subnet.lab-subnet-2a.id, data.aws_subnet.lab-subnet-2b.id ]
-  security_groups    = [ aws_security_group.gitlab-sg.id ]
+  security_groups    = [ aws_security_group.gitlab-user-access-sg.id ]
   connection_logs {
     enabled = "false"
     bucket  = ""
@@ -77,4 +77,33 @@ resource "aws_lb_target_group_attachment" "gitlab-server" {
   target_group_arn = aws_lb_target_group.gitlab-server.arn
   target_id        = aws_instance.gitlab-ec2.id
   port             = 80
+}
+
+# ---
+
+resource "aws_security_group" "gitlab-alb-access-sg" {
+  name        = "${var.project-name}-gitlab-alb-access-sg"
+  description = "Security group and rules for user access to the Lab VPC gitlab server"
+  vpc_id      = data.aws_vpc.lab-vpc.id
+  tags = {
+    Name = "${var.project-name}-gitlab-alb-access-sg"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb-allow-http-80" {
+  description = "Allow inbound alb http traffic targeted for the Lab VPC gitlab server"
+  security_group_id = aws_security_group.gitlab-alb-access-sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alb-allow-https-443" {
+  description = "Allow inbound alb https traffic targeted for the Lab VPC gitlab server"
+  security_group_id = aws_security_group.gitlab-alb-access-sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
 }

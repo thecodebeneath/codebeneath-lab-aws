@@ -45,7 +45,7 @@ resource "aws_instance" "gitlab-ec2" {
   key_name                = var.gitlab-key-name
   iam_instance_profile    = aws_iam_instance_profile.gitlab-ec2.name
   availability_zone       = "us-east-2a"
-  vpc_security_group_ids  = [aws_security_group.gitlab-sg.id]
+  vpc_security_group_ids  = [aws_security_group.gitlab-dev-access-sg.id, aws_security_group.gitlab-user-access-sg.id]
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -93,47 +93,48 @@ resource "aws_volume_attachment" "datavol" {
   instance_id = aws_instance.gitlab-ec2.id
 }
 
-resource "aws_security_group" "gitlab-sg" {
-  name        = "${var.project-name}-gitlab-sg"
-  description = "Security group and rules for the Lab VPC gitlab server"
+resource "aws_security_group" "gitlab-dev-access-sg" {
+  name        = "${var.project-name}-gitlab-dev-access-sg"
+  description = "Security group and rules for dev access to the Lab VPC gitlab host"
   vpc_id      = data.aws_vpc.lab-vpc.id
 
   tags = {
-    Name = "${var.project-name}-gitlab-sg"
+    Name = "${var.project-name}-gitlab-dev-access-sg"
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_http_80" {
-  description = "Allow inbound http traffic to the Lab VPC gitlab server"
-  security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 80
-  ip_protocol       = "tcp"
-  to_port           = 80
+resource "aws_security_group" "gitlab-user-access-sg" {
+  name        = "${var.project-name}-gitlab-user-access-sg"
+  description = "Security group and rules for user access from alb to the Lab VPC gitlab server"
+  vpc_id      = data.aws_vpc.lab-vpc.id
+
+  tags = {
+    Name = "${var.project-name}-gitlab-user-access-sg"
+  }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_https_443" {
-  description = "Allow inbound https traffic to the Lab VPC gitlab server"
-  security_group_id = aws_security_group.gitlab-sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 443
-  ip_protocol       = "tcp"
-  to_port           = 443
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow_ssh_22" {
+resource "aws_vpc_security_group_ingress_rule" "dev-allow-ssh-22" {
   #checkov:skip=CKV_AWS_24:Ensure no security groups allow ingress from 0.0.0.0:0 to port 22
   description = "Allow inbound ssh traffic to the Lab VPC gitlab server"
-  security_group_id = aws_security_group.gitlab-sg.id
+  security_group_id = aws_security_group.gitlab-dev-access-sg.id
   cidr_ipv4         = "${local.workstation-ip}/32"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
 }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+resource "aws_vpc_security_group_ingress_rule" "user-allow-http-80" {
+  description = "Allow inbound http traffic to the Lab VPC gitlab server"
+  security_group_id = aws_security_group.gitlab-user-access-sg.id
+  referenced_security_group_id = aws_security_group.gitlab-alb-access-sg.id
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow-all-traffic-ipv4" {
   description = "Allow all outbound traffic from Lab VPC gitlab server"
-  security_group_id = aws_security_group.gitlab-sg.id
+  security_group_id = aws_security_group.gitlab-dev-access-sg.id  # aws_security_group.gitlab-user-access-sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
