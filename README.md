@@ -91,6 +91,16 @@ tofu apply -var-file=codebeneath.tfvars
 tofu destroy -var-file=codebeneath.tfvars
 ```
 
+### Managed Streaming Kafka
+Create a Kafka cluster and an EC2 instance to test sending messages to topics from the console
+
+```
+cd ./msk/terraform
+tofu init -upgrade
+tofu apply -var-file=codebeneath.tfvars
+tofu destroy -var-file=codebeneath.tfvars
+```
+
 ## Security, Policy and Linting Scans
 Checkov scans:
 ```
