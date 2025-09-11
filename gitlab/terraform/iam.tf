@@ -91,18 +91,29 @@ resource "aws_iam_role" "gitlab-runner-role" {
   name = "${var.project-name}-gitlab-runner-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/gitlab.codebeneath-labs.org"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "gitlab.codebeneath-labs.org:sub": "project_path:codebeneath/tf:ref_type:branch:ref:main"
+    Statement = [
+      {
+        "Sid": "AllowGitlabPipelinesForSpecificProjects",
+        "Effect": "Allow",
+        "Principal": {
+          "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/gitlab.codebeneath-labs.org"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+          "StringEquals": {
+            "gitlab.codebeneath-labs.org:sub": "project_path:codebeneath/tf:ref_type:branch:ref:main"
+          }
         }
+      },
+      {
+        "Sid": "AllowDevsToAssumeRole",
+        "Effect": "Allow",
+        "Principal": {
+            "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${var.dev-username}"
+        },
+        "Action": "sts:AssumeRole"
       }
-    }]
+    ]
   })
   tags = {
     Name = "${var.project-name}-gitlab-runner-role"

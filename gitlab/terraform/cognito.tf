@@ -67,11 +67,6 @@ resource "aws_cognito_user_pool" "gitlab-user-pool" {
   sign_in_policy {
     allowed_first_auth_factors = ["PASSWORD"]
   }
-  # sms_configuration {
-  #   external_id    = "d161a3eb-0cb3-4467-8032-4485196c4734"
-  #   sns_caller_arn = "arn:aws:iam::732457136693:role/service-role/CognitoIdpSNSServiceRole"
-  #   sns_region     = "us-east-2"
-  # }
   user_pool_tier      = "ESSENTIALS"
   username_attributes = ["email", "phone_number"]
   username_configuration {

@@ -27,3 +27,9 @@ variable gitlab-cert-domain {
   default     = "*.codebeneath-labs.org"
   description = "Wildcard domain of the Certificate Manager imported certificate"
 }
+
+variable dev-username {
+  type        = string
+  nullable    = false
+  description = "Dev username that can assume gitlab runner role for debugging purposes"
+}
