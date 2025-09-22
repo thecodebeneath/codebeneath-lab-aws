@@ -3,6 +3,14 @@ This module will create a Kafka cluster with 2 nodes. It allows access only from
 
 Ref: [Get Started with Amazon Managed Streaming for Apache Kafka (MSK) | Amazon Web Services](https://www.youtube.com/watch?v=5WaIgJwYpS8)
 
+**MSK clusters take a long time to create and update. My observations are:**
+| Operation | Time |
+| --------- | ---- |
+| Create cluster | 1h 10m |
+| Enable/disable multi-vpc connectivity (PrivateLink) | 20m |
+| Update cluster config | 5m |
+| Destroy cluster | 3m |
+
 # MSK Cluster Config
 
 The MSK cluster has these relevant configurations:
