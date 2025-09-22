@@ -53,7 +53,7 @@ Create a topic
 export KAFKA_CLUSTER_ARN=$(aws kafka list-clusters | jq -r '.ClusterInfoList[0].ClusterArn')
 export KAFKA_CLUSTER_SERVERS=$(aws kafka get-bootstrap-brokers --cluster-arn "$KAFKA_CLUSTER_ARN" | jq -r '.BootstrapBrokerStringSaslScram')
 export KAFKA_TOPIC="CodebeneathTopic-SCRAM"
-mkdir -p ~/auth-sasl-iam
+mkdir -p ~/auth-sasl-scram
 
 Get the Secrets Manager secret value from "AmazonMSK_codebeneath-lab-msk-scram-secret"
 

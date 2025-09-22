@@ -27,3 +27,9 @@ variable dev-username {
   nullable    = false
   description = "Dev username that can assume Kafka client auth IAM role for debugging purposes"
 }
+
+variable msk-allowed-account {
+  type        = string
+  nullable    = false
+  description = "Allowed accounts that are external to the MSK hosting account that may create a PrivateLink connection"
+}
