@@ -1,5 +1,7 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 resource "aws_iam_role" "kafka-client-ec2-role" {
   name = "${var.project-name}-kafka-client-ec2-role"
   assume_role_policy = jsonencode({

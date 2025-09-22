@@ -8,6 +8,7 @@ resource "random_password" "password" {
 
 resource "aws_kms_key" "secret-key" {
   description = "MSK client SASL/SCRAM auth secret key"
+  deletion_window_in_days = 7
 }
 
 resource "aws_kms_alias" "secret-key-alias" {
@@ -17,7 +18,9 @@ resource "aws_kms_alias" "secret-key-alias" {
 
 resource "aws_secretsmanager_secret" "msk-scram-auth" {
   name = "AmazonMSK_${var.project-name}-msk-scram-secret"
+  description = "MSK client SASL/SCRAM auth secret"
   kms_key_id = aws_kms_key.secret-key.id
+  recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "alice" {
