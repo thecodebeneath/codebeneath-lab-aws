@@ -70,10 +70,6 @@ resource "aws_iam_policy" "client-auth-bob-policy" {
   }
 }
 
-# "Resource": "arn:aws:kafka:us-east-2:732457136693:cluster/codebeneath-lab-kafka-cluster/6068c4d0-3848-4d96-a4a3-bd9533fe46e2-2"
-# "Resource": "arn:aws:kafka:us-east-2:732457136693:topic/codebeneath-lab-kafka-cluster/6068c4d0-3848-4d96-a4a3-bd9533fe46e2-2/<TOPIC_NAME_HERE>"
-# "Resource": "arn:aws:kafka:us-east-2:732457136693:group/codebeneath-lab-kafka-cluster/6068c4d0-3848-4d96-a4a3-bd9533fe46e2-2/<GROUP_NAME_HERE>"
-
 resource "aws_iam_role_policy_attachment" "client-auth-bob-policy-attach" {
   policy_arn = aws_iam_policy.client-auth-bob-policy.arn
   role       = aws_iam_role.client-auth-bob-role.name

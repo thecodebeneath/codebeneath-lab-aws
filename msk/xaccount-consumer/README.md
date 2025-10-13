@@ -22,7 +22,9 @@ Using AWS console, click MSK > MSK Clusters > Managed VPC connections > Create c
 3. Attach a security groups that allows outbound ports 14000-14100
 
 ```bash
-export KAFKA_CLUSTER_ARN="PROVIDED-ARN-FROM-SOURCE-ACCOUNT"
+Copy the value MSK > Managed VPC connections > click new entry > Cluster connection string
+
+export KAFKA_CLUSTER_SERVERS=b-1.scram.codebeneathlabkafkaclu.1yjn08.c2.kafka.us-east-2.amazonaws.com:14001,b-2.scram.codebeneathlabkafkaclu.1yjn08.c2.kafka.us-east-2.amazonaws.com:14002
 ```
 
 Run remaining steps for topic and message actions. See [../README.md](../README.md)

@@ -45,3 +45,9 @@ variable bootstrap-key-name {
   nullable    = false
   description = "EC2 keypair to use to ssh into the bootstrap server"
 }
+
+variable msk-target-cluster-arn {
+  type        = string
+  nullable    = false
+  description = "MSK target cluster ARN that has enabled multi-vpc private connectivity from other accounts"
+}
