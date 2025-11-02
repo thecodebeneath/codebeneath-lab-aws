@@ -46,3 +46,9 @@ terraform.rc
 generated.tf
 # Terraformer generated code
 generated/
+
+# Debezium MSK Connector plugin files
+*.zip
+*.tar.gz
+debezium-connector-*
+

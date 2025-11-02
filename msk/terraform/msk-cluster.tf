@@ -19,6 +19,13 @@ data "aws_subnet" "lab-subnet-2b" {
     }
 }
 
+data "aws_subnet" "lab-subnet-2c" {
+    filter {
+      name   = "tag:Name"
+      values = ["${var.project-name}-public-2c"]
+    }
+}
+
 data "aws_iam_policy_document" "allow-msk-multivpc-connectivity" {
   statement {
     sid = "AWSKafkaMultivpcConnectivityPolicy"
@@ -45,7 +52,7 @@ resource "aws_msk_configuration" "kafka-config" {
   kafka_versions = ["3.8.x"]
 
   server_properties = <<PROPERTIES
-auto.create.topics.enable=false
+auto.create.topics.enable=true
 default.replication.factor=3
 min.insync.replicas=2
 num.io.threads=8
@@ -66,34 +73,34 @@ resource "aws_msk_cluster" "kafka-cluster" {
   kafka_version          = "3.8.x"
   region                 = "us-east-2"
   storage_mode           = "LOCAL"
-  number_of_broker_nodes = "2"
+  number_of_broker_nodes = "3"
 
-  configuration_info {
-    arn = aws_msk_configuration.kafka-config.arn
-    revision = aws_msk_configuration.kafka-config.latest_revision
-  }
+  # configuration_info {
+  #   arn = aws_msk_configuration.kafka-config.arn
+  #   revision = aws_msk_configuration.kafka-config.latest_revision
+  # }
 
   broker_node_group_info {
-    instance_type   = "kafka.m5.large"
+    instance_type   = "kafka.t3.small"
     az_distribution = "DEFAULT"
-    client_subnets  = [data.aws_subnet.lab-subnet-2a.id, data.aws_subnet.lab-subnet-2b.id]
+    client_subnets  = [data.aws_subnet.lab-subnet-2a.id, data.aws_subnet.lab-subnet-2b.id, data.aws_subnet.lab-subnet-2c.id]
     security_groups = [aws_security_group.kafka-cluster-sg.id]
 
     # multi-vpc private connectivity settings
-    connectivity_info {
-      public_access {
-        type = "DISABLED"
-      }
-      vpc_connectivity {
-        client_authentication {
-          sasl {
-            iam   = "true"
-            scram = "true"
-          }
-          tls = "false"
-        }
-      }
-    }
+    # connectivity_info {
+    #   public_access {
+    #     type = "DISABLED"
+    #   }
+    #   vpc_connectivity {
+    #     client_authentication {
+    #       sasl {
+    #         iam   = "true"
+    #         scram = "true"
+    #       }
+    #       tls = "false"
+    #     }
+    #   }
+    # }
 
     storage_info {
       ebs_storage_info {
@@ -169,6 +176,15 @@ resource "aws_vpc_security_group_ingress_rule" "allow-kafka-client-ec2" {
   security_group_id            = aws_security_group.kafka-cluster-sg.id
   referenced_security_group_id = aws_security_group.kafka-client-sg.id
   ip_protocol                  = "-1" # semantically equivalent to all ports
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow-kafka-connect-to-cluster" {
+  description                  = "Allow MSK connector IAM and SCRAM"
+  security_group_id            = aws_security_group.kafka-cluster-sg.id
+  ip_protocol                  = "tcp"
+  from_port                    = 9096
+  to_port                      = 9098
+  cidr_ipv4                    = "10.30.0.0/16"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow-cluster-all-traffic-ipv4" {

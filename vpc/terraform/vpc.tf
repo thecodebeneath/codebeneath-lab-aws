@@ -47,6 +47,16 @@ resource "aws_subnet" "lab-public-2b" {
   }
 }
 
+resource "aws_subnet" "lab-public-2c" {
+  vpc_id                  = aws_vpc.lab.id
+  cidr_block              = var.public-subnet-2c-cidr-block
+  availability_zone       = "us-east-2c"
+  map_public_ip_on_launch = false
+  tags = {
+    Name = "${var.project-name}-public-2c"
+  }
+}
+
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.lab.id
   cidr_block        = var.private-subnet-cidr-block

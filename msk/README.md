@@ -90,7 +90,7 @@ exit
 ./kafka-console-consumer.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --consumer.config /home/ec2-user/auth-sasl-scram/client_sasl.properties --topic "$KAFKA_TOPIC" --from-beginning
 exit
 ```
-### User `Bob` - SCRAM Auth
+### User `Bob` - IAM Auth
 
 User `bob` connects to the MSK cluster using client_authentication method `iam`. Note that the MSK cluster brokers have unique endpoints for IAM connections `BootstrapBrokerStringSaslIam`.
 
@@ -102,7 +102,7 @@ vi ~/.aws/config
 region = us-east-2
 ```
 
-vi ~/aws/credentials
+vi ~/.aws/credentials
 ```
 [bob]
 role_arn = arn:aws:iam::ACCNT:role/codebeneath-lab-kafka-client-auth-bob-role
