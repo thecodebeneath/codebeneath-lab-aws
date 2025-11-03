@@ -14,6 +14,28 @@ trusted entities policy
 
 ---
 
+codebeneath-allow-rds-credentials
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowMySqlRDSCredentials",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:us-east-2:732457136693:secret:codebeneath/mysql/user-R0t9TF"
+            ]
+        }
+    ]
+}
+
+---
+
 codebeneath-msk-connect-service-execution-allow
 {
     "Version": "2012-10-17",

@@ -1,0 +1,74 @@
+{
+	"connectorConfiguration": {
+		"connector.class": "io.debezium.connector.mysql.MySqlConnector",
+		"tasks.max": "1",
+		"database.hostname": "database-1.cjkskms0mtc9.us-east-2.rds.amazonaws.com",
+		"database.port": "3306",
+		"database.user": "${secretsManager:codebeneath/mysql/user:username}",
+		"database.password": "${secretsManager:codebeneath/mysql/user:password}",
+		"database.server.id": "1773682036",
+        "database.server.name": "codebeneath-server",
+		"database.include.list": "testdb",
+		"topic.prefix": "mysql-testdb-271",
+		"topic.creation.enable": "true",
+		"topic.creation.default.replication.factor": "-1",  
+        "topic.creation.default.partitions": "-1",
+		"schema.history.internal.kafka.topic": "connector-request-topic-271",
+		"schema.history.internal.kafka.bootstrap.servers": "b-3.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098,b-2.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098,b-1.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098",
+		"schema.history.internal.consumer.security.protocol": "SASL_SSL",
+		"schema.history.internal.consumer.sasl.mechanism": "AWS_MSK_IAM",
+		"schema.history.internal.consumer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+		"schema.history.internal.consumer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+		"schema.history.internal.producer.security.protocol": "SASL_SSL",
+		"schema.history.internal.producer.sasl.mechanism": "AWS_MSK_IAM",
+		"schema.history.internal.producer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+		"schema.history.internal.producer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+		"include.schema.changes": "true"
+	},
+	"connectorName": "codebeneath-debezium-source-connector",
+	"kafkaCluster": {
+		"apacheKafkaCluster": {
+			"bootstrapServers": "b-3.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098,b-2.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098,b-1.codebeneathlabkafkaclu.6mhru7.c4.kafka.us-east-2.amazonaws.com:9098",
+			"vpc": {
+				"subnets": [
+					"subnet-0f4306818d58c0fb7",
+					"subnet-0b7b6b20b835b2649",
+					"subnet-038ab493157aece31"
+				],
+				"securityGroups": ["sg-05106bb3614549af1"]
+			}
+		}
+	},
+	"capacity": {
+		"provisionedCapacity": {
+			"mcuCount": 2,
+			"workerCount": 1
+		}
+	},
+    "kafkaConnectVersion": "2.7.1",
+	"serviceExecutionRoleArn": "arn:aws:iam::732457136693:role/codebeneath-msk-connect-service-execution-role",
+	"plugins": [{
+		"customPlugin": {
+			"customPluginArn": "arn:aws:kafkaconnect:us-east-2:732457136693:custom-plugin/debezium-connector-mysql-secrets-manager-2-7-4/2a0f7a1f-7b7d-43db-aa7f-30973626da2e-2",
+			"revision": 1
+		}
+	}],
+	"kafkaClusterEncryptionInTransit": {
+		"encryptionType": "TLS"
+	},
+	"kafkaClusterClientAuthentication": {
+		"authenticationType": "IAM"
+	},
+	"workerConfiguration": {
+		"workerConfigurationArn": "arn:aws:kafkaconnect:us-east-2:732457136693:worker-configuration/kafka-connector-worker-secrets-manager/436bd792-3dee-4dd4-a0a0-d7c2e54e1aba-2",
+		"revision": 1
+	},
+	"logDelivery": { 
+		"workerLogDelivery": {
+			"cloudWatchLogs": {
+				"enabled": true,
+				"logGroup": "codebeneath-msk-connect"
+			}
+		}
+	}
+}

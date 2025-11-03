@@ -4,6 +4,7 @@ Use MSK Connect to capture MySQL data change sets, push them through Connect to 
 
 Version compatibility:
 - Debezium Release Series 2.7	
+  - Kafka AWS Secrets Manager Config Provider (jcustenborder) 0.1.2
 - MySQL 8.0.x
 - MSK Kafka 2.7.1
 - MSK Connect 2.7.1
@@ -94,6 +95,14 @@ MySQL> insert into testdb.student values (7,'Bob','Alice');
 MySQL> insert into testdb.teacher values (9,'The','Codebeneath');
 ```
 
+### Secrets Manager for User
+
+Secret type: `Credentials for Amazon RDS database`
+Credentials: `username & password`
+Encryption key: `default`
+Database: `RDS MySQL instance`
+Secret name: `codebeneath/mysql/user`
+
 ## MSK Connect
 
 ### MSK Custom Plugin
@@ -106,11 +115,13 @@ Ref: https://github.com/aws-samples/aws-msk-cdc-data-pipeline-with-debezium/tree
 cd plugin
 wget https://repo1.maven.org/maven2/io/debezium/debezium-connector-mysql/2.7.4.Final/debezium-connector-mysql-2.7.4.Final-plugin.tar.gz
 tar xzf debezium-connector-mysql-2.7.4.Final-plugin.tar.gz
+wget https://hub-downloads.confluent.io/api/plugins/jcustenborder/kafka-config-provider-aws/versions/0.1.2/jcustenborder-kafka-config-provider-aws-0.1.2.zip
+unzip jcustenborder-kafka-config-provider-aws-0.1.2.zip -d debezium-connector-mysql
 cd debezium-connector-mysql
-zip -9 ../debezium-connector-mysql-2.7.4.zip *
+zip -9 -r ../debezium-connector-mysql-secrets-manager-2.7.4.zip *
 cd ..
 
-aws s3 cp debezium-connector-mysql-2.7.4.zip s3://codebeneath-dev/wip/
+aws s3 cp debezium-connector-mysql-secrets-manager-2.7.4.zip s3://codebeneath-dev/wip/
 ```
 
 ```bash
@@ -122,6 +133,7 @@ aws kafkaconnect describe-custom-plugin --custom-plugin-arn "arn:aws:kafkaconnec
 ### Connector Service Execution Role
 
 - Role: codebeneath-msk-connect-service-execution-role
+  -- policy: codebeneath-allow-rds-credentials
   -- policy: codebeneath-msk-connect-service-execution-allow
   -- policy: codebeneath-msk-connect-service-executor-cloudwatch
   -- policy: kafka-connect-service-role-policy
@@ -129,7 +141,7 @@ aws kafkaconnect describe-custom-plugin --custom-plugin-arn "arn:aws:kafkaconnec
 ### Connector Worker Configuration
 
 ```bash
-aws kafkaconnect create-worker-configuration --name kafka-connector-worker --properties-file-content $(cat connector-worker-config.properties | base64 -w 0)
+aws kafkaconnect create-worker-configuration --name kafka-connector-worker-secrets-manager --properties-file-content $(cat connector-worker-config.properties | base64 -w 0)
 ```
 
 ### Connector
