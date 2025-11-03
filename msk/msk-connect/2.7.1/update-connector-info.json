@@ -1,0 +1,26 @@
+{
+   "connectorArn": "arn:aws:kafkaconnect:us-east-2:732457136693:connector/codebeneath-debezium-source-connector/dca47542-a9fb-49e7-93ec-8ea30456a697-2",
+   "connectorConfiguration": {
+		"connector.class": "io.debezium.connector.mysql.MySqlConnector",
+		"tasks.max": "1",
+		"database.hostname": "database-1.cjkskms0mtc9.us-east-2.rds.amazonaws.com",
+		"database.port": "3306",
+		"database.user": "<${secretManager:rds!db-426865da-91d9-4718-90bd-1efb87c63a40:username}>",
+		"database.password": "<${secretManager:rds!db-426865da-91d9-4718-90bd-1efb87c63a40:password}>",
+		"database.server.id": "123456",
+		"database.include.list": "mysql",
+		"topic.prefix": "rds-mysql",
+		"schema.history.internal.kafka.topic": "connector-request-topic",
+		"schema.history.internal.kafka.bootstrap.servers": "b-2.codebeneathlabkafkaclu.1gg02u.c4.kafka.us-east-2.amazonaws.com:9098,b-1.codebeneathlabkafkaclu.1gg02u.c4.kafka.us-east-2.amazonaws.com:9098",
+		"schema.history.internal.consumer.security.protocol": "SASL_SSL",
+		"schema.history.internal.consumer.sasl.mechanism": "AWS_MSK_IAM",
+		"schema.history.internal.consumer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+		"schema.history.internal.consumer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+		"schema.history.internal.producer.security.protocol": "SASL_SSL",
+		"schema.history.internal.producer.sasl.mechanism": "AWS_MSK_IAM",
+		"schema.history.internal.producer.sasl.jaas.config": "software.amazon.msk.auth.iam.IAMLoginModule required;",
+		"schema.history.internal.producer.sasl.client.callback.handler.class": "software.amazon.msk.auth.iam.IAMClientCallbackHandler",
+		"include.schema.changes": "true"
+	},
+    "currentVersion": "1"
+}

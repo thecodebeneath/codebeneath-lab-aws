@@ -75,10 +75,10 @@ resource "aws_msk_cluster" "kafka-cluster" {
   storage_mode           = "LOCAL"
   number_of_broker_nodes = "3"
 
-  # configuration_info {
-  #   arn = aws_msk_configuration.kafka-config.arn
-  #   revision = aws_msk_configuration.kafka-config.latest_revision
-  # }
+  configuration_info {
+    arn = aws_msk_configuration.kafka-config.arn
+    revision = aws_msk_configuration.kafka-config.latest_revision
+  }
 
   broker_node_group_info {
     instance_type   = "kafka.t3.small"
@@ -158,7 +158,6 @@ resource "aws_msk_cluster" "kafka-cluster" {
 resource "aws_msk_cluster_policy" "msk-cluster-policy" {
   cluster_arn = aws_msk_cluster.kafka-cluster.arn
   policy = data.aws_iam_policy_document.allow-msk-multivpc-connectivity.json
-
 }
 
 resource "aws_security_group" "kafka-cluster-sg" {

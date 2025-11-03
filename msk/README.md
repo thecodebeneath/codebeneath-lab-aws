@@ -74,7 +74,7 @@ export KAFKA_OPTS="-Djava.security.auth.login.config=/home/ec2-user/auth-sasl-sc
 
 cd ~/kafka_2.12-3.8.1/bin
 
-./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties --replication-factor 2 --partitions 1 --topic "$KAFKA_TOPIC"
+./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties --replication-factor 3 --partitions 1 --topic "$KAFKA_TOPIC"
 
 ./kafka-topics.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties --list
 ```
@@ -126,7 +126,7 @@ EOF
 
 cd ~/kafka_2.12-3.8.1/bin
 
-./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --replication-factor 2 --partitions 1 --topic "$KAFKA_TOPIC"
+./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --replication-factor 3 --partitions 1 --topic "$KAFKA_TOPIC"
 
 ./kafka-topics.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --list
 ```

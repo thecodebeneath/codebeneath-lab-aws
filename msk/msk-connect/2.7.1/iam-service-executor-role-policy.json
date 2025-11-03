@@ -1,0 +1,159 @@
+codebeneath-allow-rds-credentials
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowMySqlRDSCredentials",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds"
+            ],
+            "Resource": [
+                "arn:aws:secretsmanager:us-east-2:732457136693:secret:rds!db-426865da-91d9-4718-90bd-1efb87c63a40-MTgdBN"
+            ]
+        }
+    ]
+}
+
+---
+
+codebeneath-msk-connect-service-execution-allow
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kafka-cluster:Connect",
+				"kafka-cluster:DescribeCluster"
+			],
+			"Resource": [
+				"arn:aws:kafka:us-east-2:732457136693:cluster/codebeneath-lab-kafka-cluster/478762f2-af90-4703-bf45-8af87c7c45c8-4"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kafka-cluster:ReadData",
+				"kafka-cluster:DescribeTopic"
+			],
+			"Resource": [
+				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kafka-cluster:WriteData",
+				"kafka-cluster:DescribeTopic"
+			],
+			"Resource": [
+				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kafka-cluster:CreateTopic",
+				"kafka-cluster:WriteData",
+				"kafka-cluster:ReadData",
+				"kafka-cluster:DescribeTopic"
+			],
+			"Resource": [
+				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": [
+				"kafka-cluster:AlterGroup",
+				"kafka-cluster:DescribeGroup"
+			],
+			"Resource": [
+				"arn:aws:kafka:us-east-2:732457136693:*"
+			]
+		}
+	]
+}
+
+---
+
+codebeneath-msk-connect-service-executor-cloudwatch
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:us-east-2:732457136693:log-group:codebeneath-msk-connect:*"
+        }
+    ]
+}
+
+---
+
+kafka-connect-service-role-policy
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface"
+            ],
+            "Resource": "arn:aws:ec2:*:*:network-interface/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestTag/AmazonMSKConnectManaged": "true"
+                },
+                "ForAllValues:StringEquals": {
+                    "aws:TagKeys": "AmazonMSKConnectManaged"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*:*:subnet/*",
+                "arn:aws:ec2:*:*:security-group/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": "arn:aws:ec2:*:*:network-interface/*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:CreateAction": "CreateNetworkInterface"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:CreateNetworkInterfacePermission",
+                "ec2:AttachNetworkInterface",
+                "ec2:DetachNetworkInterface",
+                "ec2:DeleteNetworkInterface"
+            ],
+            "Resource": "arn:aws:ec2:*:*:network-interface/*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/AmazonMSKConnectManaged": "true"
+                }
+            }
+        }
+    ]
+}
