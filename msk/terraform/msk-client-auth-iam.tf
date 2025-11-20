@@ -50,6 +50,7 @@ resource "aws_iam_policy" "client-auth-bob-policy" {
         "Action": [
             "kafka-cluster:DescribeTopic",
             "kafka-cluster:CreateTopic",
+            "kafka-cluster:DeleteTopic",
             "kafka-cluster:WriteData",
             "kafka-cluster:ReadData"
         ],

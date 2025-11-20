@@ -22,3 +22,23 @@ output msk-cluster-uuid {
   value = aws_msk_cluster.kafka-cluster.cluster_uuid
   description = "The MSK cluster UUID. Needs the cluster name to be complete"
 }
+
+output bootstrap-endpoints-scram {
+  value = aws_msk_cluster.kafka-cluster.bootstrap_brokers_sasl_scram
+  description = "The MSK cluster bootstrap endpoints for SCRAM authentication"
+}
+
+output bootstrap-endpoints-iam {
+  value = aws_msk_cluster.kafka-cluster.bootstrap_brokers_sasl_iam
+  description = "The MSK cluster bootstrap endpoints for IAM authentication"
+}
+
+output bootstrap-public-endpoints-scram {
+  value = aws_msk_cluster.kafka-cluster.bootstrap_brokers_public_sasl_scram
+  description = "The MSK cluster bootstrap public endpoints for SCRAM authentication"
+}
+
+output bootstrap-public-endpoints-iam {
+  value = aws_msk_cluster.kafka-cluster.bootstrap_brokers_public_sasl_iam
+  description = "The MSK cluster bootstrap public endpoints for IAM authentication"
+}

@@ -76,7 +76,7 @@ cd ~/kafka_2.12-3.8.1/bin
 
 ./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties --replication-factor 3 --partitions 1 --topic "$KAFKA_TOPIC"
 
-./kafka-topics.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties --list
+./kafka-topics.sh --list --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-scram/client_sasl.properties
 ```
 
 #### Producer runs from this shell
@@ -128,7 +128,7 @@ cd ~/kafka_2.12-3.8.1/bin
 
 ./kafka-topics.sh --create --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --replication-factor 3 --partitions 1 --topic "$KAFKA_TOPIC"
 
-./kafka-topics.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --list
+./kafka-topics.sh --list --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties 
 ```
 
 #### Producer runs from this shell
@@ -153,7 +153,7 @@ For all ACL management steps below, setup the cli-server to use the IAM "bob" co
 
 ### List ACLs
 ```bash
-./kafka-acls.sh --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties --list
+./kafka-acls.sh --list --bootstrap-server "$KAFKA_CLUSTER_SERVERS" --command-config /home/ec2-user/auth-sasl-iam/client_sasl.properties
 ```
 
 ### Add ACL

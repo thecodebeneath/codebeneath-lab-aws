@@ -36,6 +36,8 @@ resource "aws_secretsmanager_secret_version" "alice" {
 resource "aws_msk_scram_secret_association" "msk-alice-scram-secret" {
   cluster_arn = aws_msk_cluster.kafka-cluster.arn
   secret_arn_list = [ aws_secretsmanager_secret.msk-scram-auth.arn ]
+
+  depends_on = [ aws_msk_cluster.kafka-cluster, aws_secretsmanager_secret_version.alice ]
 }
 
 data "aws_iam_policy_document" "allow-msk-scram-secret-policy" {

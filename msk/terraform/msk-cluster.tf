@@ -1,3 +1,8 @@
+# import {
+#   to = aws_msk_cluster.kafka-cluster
+#   id = "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:cluster/codebeneath-lab-kafka-cluster/da1a8d36-3abc-4792-8cbe-c7932c900a07-4"
+# }
+
 data "aws_vpc" "lab-vpc" {
     filter {
       name   = "tag:Name"
@@ -86,21 +91,21 @@ resource "aws_msk_cluster" "kafka-cluster" {
     client_subnets  = [data.aws_subnet.lab-subnet-2a.id, data.aws_subnet.lab-subnet-2b.id, data.aws_subnet.lab-subnet-2c.id]
     security_groups = [aws_security_group.kafka-cluster-sg.id]
 
-    # multi-vpc private connectivity settings
-    # connectivity_info {
-    #   public_access {
-    #     type = "DISABLED"
-    #   }
-    #   vpc_connectivity {
-    #     client_authentication {
-    #       sasl {
-    #         iam   = "true"
-    #         scram = "true"
-    #       }
-    #       tls = "false"
-    #     }
-    #   }
-    # }
+    connectivity_info {
+      public_access {
+        type = "SERVICE_PROVIDED_EIPS"
+      }
+      # multi-vpc private connectivity settings
+      # vpc_connectivity {
+      #   client_authentication {
+      #     sasl {
+      #       iam   = "true"
+      #       scram = "true"
+      #     }
+      #     tls = "false"
+      #   }
+      # }
+    }
 
     storage_info {
       ebs_storage_info {
@@ -128,7 +133,8 @@ resource "aws_msk_cluster" "kafka-cluster" {
   logging_info {
     broker_logs {
       cloudwatch_logs {
-        enabled = "false"
+        enabled = "true"
+        log_group = aws_cloudwatch_log_group.msk-cluster-log-group.name
       }
 
       firehose {
@@ -160,6 +166,15 @@ resource "aws_msk_cluster_policy" "msk-cluster-policy" {
   policy = data.aws_iam_policy_document.allow-msk-multivpc-connectivity.json
 }
 
+resource "aws_cloudwatch_log_group" "msk-cluster-log-group" {
+  name = "${var.project-name}-kafka-cluster-logs"
+  retention_in_days = 7
+  
+  tags = {
+    Name = "${var.project-name}-kafka-cluster-logs"
+  }
+}
+
 resource "aws_security_group" "kafka-cluster-sg" {
   name        = "${var.project-name}-kafka-cluster-sg"
   description = "Security group and rules for the Lab VPC kafka cluster"
@@ -175,6 +190,15 @@ resource "aws_vpc_security_group_ingress_rule" "allow-kafka-client-ec2" {
   security_group_id            = aws_security_group.kafka-cluster-sg.id
   referenced_security_group_id = aws_security_group.kafka-client-sg.id
   ip_protocol                  = "-1" # semantically equivalent to all ports
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow-acl-mgmt-by-terraform" {
+  description = "Allow terraform ACL creation from developer workstation"
+  security_group_id = aws_security_group.kafka-cluster-sg.id
+  cidr_ipv4         = "${local.workstation-ip}/32"
+  ip_protocol       = "tcp"
+  from_port         = 9196
+  to_port           = 9198
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow-kafka-connect-to-cluster" {
