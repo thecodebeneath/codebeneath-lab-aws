@@ -4,8 +4,8 @@
 		"tasks.max": "1",
 		"database.hostname": "database-1.cjkskms0mtc9.us-east-2.rds.amazonaws.com",
 		"database.port": "3306",
-		"database.user": "bob",
-		"database.password": "hispassword",
+		"database.user": "PLACEHOLDER",
+		"database.password": "PLACEHOLDER",
 		"database.server.id": "1773682036",
         "database.server.name": "codebeneath-server",
 		"database.include.list": "testdb",
@@ -46,10 +46,10 @@
 		}
 	},
     "kafkaConnectVersion": "2.7.1",
-	"serviceExecutionRoleArn": "arn:aws:iam::732457136693:role/codebeneath-msk-connect-service-execution-role",
+	"serviceExecutionRoleArn": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/codebeneath-msk-connect-service-execution-role",
 	"plugins": [{
 		"customPlugin": {
-			"customPluginArn": "arn:aws:kafkaconnect:us-east-2:732457136693:custom-plugin/debezium-connector-mysql-2-7-4/a2d70e37-876c-4259-b57e-27b35c286b94-2",
+			"customPluginArn": "arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:custom-plugin/debezium-connector-mysql-2-7-4/a2d70e37-876c-4259-b57e-27b35c286b94-2",
 			"revision": 1
 		}
 	}],
@@ -60,7 +60,7 @@
 		"authenticationType": "IAM"
 	},
 	"workerConfiguration": {
-		"workerConfigurationArn": "arn:aws:kafkaconnect:us-east-2:732457136693:worker-configuration/kafka-connector-worker/6e36a10c-0558-4aa5-9389-672f9404e9e9-2",
+		"workerConfigurationArn": "arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:worker-configuration/kafka-connector-worker/6e36a10c-0558-4aa5-9389-672f9404e9e9-2",
 		"revision": 1
 	},
 	"logDelivery": { 

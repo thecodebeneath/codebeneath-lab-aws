@@ -1,0 +1,10 @@
+{
+    "name": "debezium-connector-mysql-3-3-1",
+    "contentType": "ZIP",
+    "location": {
+        "s3Location": {
+            "bucketArn": "arn:aws:s3:::codebeneath-dev",
+            "fileKey": "wip/debezium-connector-mysql-3.3.1.zip"
+        }
+    }
+}

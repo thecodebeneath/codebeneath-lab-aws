@@ -9,10 +9,10 @@
 			"Action": "sts:AssumeRole",
 			"Condition": {
 				"StringEquals": {
-					"aws:SourceAccount": "732457136693"
+					"aws:SourceAccount": "${data.aws_caller_identity.current.account_id}"
 				},
 				"ArnLike": {
-					"aws:SourceArn": "arn:aws:kafkaconnect:us-east-2:732457136693:connector/*"
+					"aws:SourceArn": "arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:connector/*"
 				}
 			}
 		}

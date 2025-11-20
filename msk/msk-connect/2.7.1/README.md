@@ -40,10 +40,10 @@ mysql --version
 
 mysql -h database-1.cjkskms0mtc9.us-east-2.rds.amazonaws.com -P 3306 -u admin -p
 
-MySQL> CREATE USER 'bob'@'localhost' IDENTIFIED BY 'hispassword';
-MySQL> CREATE USER 'bob'@'%' IDENTIFIED BY 'hispassword';
-MySQL> GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT, LOCK TABLES ON *.* TO 'bob'@'localhost';
-MySQL> GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT, LOCK TABLES ON *.* TO 'bob'@'%';
+MySQL> CREATE USER 'PLACEHOLDER'@'localhost' IDENTIFIED BY 'PLACEHOLDER';
+MySQL> CREATE USER 'PLACEHOLDER'@'%' IDENTIFIED BY 'PLACEHOLDER';
+MySQL> GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT, LOCK TABLES ON *.* TO 'PLACEHOLDER'@'localhost';
+MySQL> GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT, LOCK TABLES ON *.* TO 'PLACEHOLDER'@'%';
 MySQL> FLUSH PRIVILEGES;
 Query OK, 0 rows affected (0.005 sec)
 
@@ -116,7 +116,7 @@ aws s3 cp debezium-connector-mysql-2.7.4.zip s3://codebeneath-dev/wip/
 ```bash
 aws kafkaconnect create-custom-plugin --cli-input-json file://debezium-source-custom-plugin.json
 
-aws kafkaconnect describe-custom-plugin --custom-plugin-arn "arn:aws:kafkaconnect:us-east-2:732457136693:custom-plugin/debezium-connector-mysql-3-3-1/dda39805-78ef-4d04-b2df-0656fbcd37ed-2"
+aws kafkaconnect describe-custom-plugin --custom-plugin-arn "arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:custom-plugin/debezium-connector-mysql-3-3-1/dda39805-78ef-4d04-b2df-0656fbcd37ed-2"
 ```
 
 ### Connector Service Execution Role
@@ -137,7 +137,7 @@ aws kafkaconnect create-worker-configuration --name kafka-connector-worker --pro
 ```bash
 aws kafkaconnect create-connector --cli-input-json file://connector-info.json
 
-aws kafkaconnect describe-connector --connector-arn arn:aws:kafkaconnect:us-east-2:732457136693:connector/codebeneath-debezium-source-connector/d29b0974-d3cf-442f-ab2a-56e835c5ad99-2
+aws kafkaconnect describe-connector --connector-arn arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:connector/codebeneath-debezium-source-connector/d29b0974-d3cf-442f-ab2a-56e835c5ad99-2
 ```
 
 ```bash

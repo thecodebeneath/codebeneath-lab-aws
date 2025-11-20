@@ -12,7 +12,7 @@ codebeneath-allow-rds-credentials
                 "secretsmanager:ListSecretVersionIds"
             ],
             "Resource": [
-                "arn:aws:secretsmanager:us-east-2:732457136693:secret:rds!db-426865da-91d9-4718-90bd-1efb87c63a40-MTgdBN"
+                "arn:aws:secretsmanager:us-east-2:${data.aws_caller_identity.current.account_id}:secret:rds!db-426865da-91d9-4718-90bd-1efb87c63a40-MTgdBN"
             ]
         }
     ]
@@ -31,7 +31,7 @@ codebeneath-msk-connect-service-execution-allow
 				"kafka-cluster:DescribeCluster"
 			],
 			"Resource": [
-				"arn:aws:kafka:us-east-2:732457136693:cluster/codebeneath-lab-kafka-cluster/478762f2-af90-4703-bf45-8af87c7c45c8-4"
+				"arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:cluster/codebeneath-lab-kafka-cluster/478762f2-af90-4703-bf45-8af87c7c45c8-4"
 			]
 		},
 		{
@@ -41,7 +41,7 @@ codebeneath-msk-connect-service-execution-allow
 				"kafka-cluster:DescribeTopic"
 			],
 			"Resource": [
-				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+				"arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
 			]
 		},
 		{
@@ -51,7 +51,7 @@ codebeneath-msk-connect-service-execution-allow
 				"kafka-cluster:DescribeTopic"
 			],
 			"Resource": [
-				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+				"arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
 			]
 		},
 		{
@@ -63,7 +63,7 @@ codebeneath-msk-connect-service-execution-allow
 				"kafka-cluster:DescribeTopic"
 			],
 			"Resource": [
-				"arn:aws:kafka:us-east-2:732457136693:topic/*"
+				"arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
 			]
 		},
 		{
@@ -73,7 +73,7 @@ codebeneath-msk-connect-service-execution-allow
 				"kafka-cluster:DescribeGroup"
 			],
 			"Resource": [
-				"arn:aws:kafka:us-east-2:732457136693:*"
+				"arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:*"
 			]
 		}
 	]
@@ -91,7 +91,7 @@ codebeneath-msk-connect-service-executor-cloudwatch
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            "Resource": "arn:aws:logs:us-east-2:732457136693:log-group:codebeneath-msk-connect:*"
+            "Resource": "arn:aws:logs:us-east-2:${data.aws_caller_identity.current.account_id}:log-group:codebeneath-msk-connect:*"
         }
     ]
 }

@@ -4,7 +4,7 @@ stages:
 verify:python:
   stage: verify
   image: python:alpine
-  # image: 732457136693.dkr.ecr.us-east-2.amazonaws.com/python:alpine
+  # image: ACCNT.dkr.ecr.us-east-2.amazonaws.com/python:alpine
   tags:
     - python
   script:
@@ -15,7 +15,7 @@ verify:terraform:
   image:
     name: hashicorp/terraform
     entrypoint: [""]
-  # image: 732457136693.dkr.ecr.us-east-2.amazonaws.com/hashicorp/terraform:latest
+  # image: ACCNT.dkr.ecr.us-east-2.amazonaws.com/hashicorp/terraform:latest
   tags:
     - tf
   script:

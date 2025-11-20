@@ -118,7 +118,7 @@ resource "aws_msk_cluster" "kafka-cluster" {
   }
 
 #   encryption_info {
-#     encryption_at_rest_kms_key_arn = "arn:aws:kms:us-east-2:732457136693:key/61b952d6-cf95-4ceb-a9c6-0cbc163eb57c"
+#     encryption_at_rest_kms_key_arn = "arn:aws:kms:us-east-2:${data.aws_caller_identity.current.account_id}:key/61b952d6-cf95-4ceb-a9c6-0cbc163eb57c"
 #     encryption_in_transit {
 #       client_broker = "PLAINTEXT"
 #       in_cluster    = "true"

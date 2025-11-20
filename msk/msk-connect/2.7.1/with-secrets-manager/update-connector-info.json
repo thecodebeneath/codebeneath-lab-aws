@@ -1,5 +1,5 @@
 {
-   "connectorArn": "arn:aws:kafkaconnect:us-east-2:732457136693:connector/codebeneath-debezium-source-connector/dca47542-a9fb-49e7-93ec-8ea30456a697-2",
+   "connectorArn": "arn:aws:kafkaconnect:us-east-2:${data.aws_caller_identity.current.account_id}:connector/codebeneath-debezium-source-connector/dca47542-a9fb-49e7-93ec-8ea30456a697-2",
    "connectorConfiguration": {
 		"connector.class": "io.debezium.connector.mysql.MySqlConnector",
 		"tasks.max": "1",

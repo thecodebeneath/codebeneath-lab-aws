@@ -1,0 +1,93 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "kafkaconnect.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+
+---
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kafka-cluster:Connect",
+                "kafka-cluster:DescribeCluster"
+            ],
+            "Resource": [
+                "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:cluster/codebeneath-lab-kafka-cluster/478762f2-af90-4703-bf45-8af87c7c45c8-4"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kafka-cluster:ReadData",
+                "kafka-cluster:DescribeTopic"
+            ],
+            "Resource": [
+                "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kafka-cluster:WriteData",
+                "kafka-cluster:DescribeTopic"
+            ],
+            "Resource": [
+                "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kafka-cluster:CreateTopic",
+                "kafka-cluster:WriteData",
+                "kafka-cluster:ReadData",
+                "kafka-cluster:DescribeTopic"
+            ],
+            "Resource": [
+                "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:topic/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "kafka-cluster:AlterGroup",
+                "kafka-cluster:DescribeGroup"
+            ],
+            "Resource": [
+                "arn:aws:kafka:us-east-2:${data.aws_caller_identity.current.account_id}:*"
+            ]
+        },
+        {
+            "Sid": "MSKConnectFullAccess",
+            "Effect": "Allow",
+            "Action": [
+                "kafkaconnect:CreateConnector",
+                "kafkaconnect:DeleteConnector",
+                "kafkaconnect:DescribeConnector",
+                "kafkaconnect:ListConnectors",
+                "kafkaconnect:UpdateConnector",
+                "kafkaconnect:CreateCustomPlugin",
+                "kafkaconnect:DeleteCustomPlugin",
+                "kafkaconnect:DescribeCustomPlugin",
+                "kafkaconnect:ListCustomPlugins",
+                "kafkaconnect:CreateWorkerConfiguration",
+                "kafkaconnect:DeleteWorkerConfiguration",
+                "kafkaconnect:DescribeWorkerConfiguration",
+                "kafkaconnect:ListWorkerConfigurations"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
