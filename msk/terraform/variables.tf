@@ -28,6 +28,16 @@ variable dev-username {
   description = "Dev username that can assume Kafka client auth IAM role for debugging purposes"
 }
 
+variable enable-kafka-public-acccess {
+  type        = string
+  default    = "DISABLED"
+  validation {
+    condition = contains(["DISABLED", "SERVICE_PROVIDED_EIPS"], var.enable-kafka-public-acccess)
+    error_message = "Environment must be either 'DISABLED' or 'SERVICE_PROVIDED_EIPS'."
+  }
+  description = "For security reasons, you can't turn on public access while creating an MSK cluster. You can turn on public access for an existing cluster."
+}
+
 variable msk-allowed-account {
   type        = string
   nullable    = false

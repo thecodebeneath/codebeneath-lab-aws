@@ -10,7 +10,7 @@ terraform {
 }
 
 provider "kafka" {
-  bootstrap_servers = split(",", "${var.bootstrap_brokers_public_sasl_iam}")
+  bootstrap_servers = split(",", "${data.terraform_remote_state.kafka-cluster.outputs.bootstrap-public-endpoints-iam}")
   tls_enabled       = true
   sasl_mechanism    = "aws-iam"
   sasl_aws_region   = "us-east-2"

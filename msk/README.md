@@ -1,5 +1,7 @@
 # Managed Streaming Kafka
-This module will create a Kafka cluster with 2 nodes. It allows access only from the cooresponding Kafka client ec2 instance.
+This module will create a MSK Kafka cluster with 3 brokers. It allows access only from the cooresponding Kafka client ec2 instance.
+
+The module also enables two authentication modes: IAM auth and SCRAM auth. Corresponding to these auth modes, it also creates a SCRAM user and an IAM role based user.
 
 Ref: [Get Started with Amazon Managed Streaming for Apache Kafka (MSK) | Amazon Web Services](https://www.youtube.com/watch?v=5WaIgJwYpS8)
 
@@ -21,6 +23,28 @@ The MSK cluster has these relevant configurations:
    1. Multi-vpc rivate connectivity also has both authentication methods enabled: SASL/SCRAM and IAM
    2. The external/consumer account must create a MSK > Managed VPC Connection to the cluster
    3. The MSK cluster owner must accept the managed VPC connection request 
+
+### Terraform ###
+
+The complete cluster is built in 3 phases that must be run serially.
+1. Provision the initial 3 broker Kafka cluster
+   ```
+   cd ./msk/terraform
+   tofu init
+   tofu apply -var-file=codebeneath.tfvars
+   ```
+2. Enable public access, which forces a cluster update operation. This access allows terraform to connect as a Kafka client and create ACLs for SCRAM users.
+   ```
+   tofu apply -var-file=codebeneath-update.tfvars
+   ```
+3. The IAM role for user `bob` will be used by terraform to create SCRAM ACLs for user `alice`.
+   ```
+   cd ./mks/kafka-acls/terraform
+   tofu init
+   tofu apply -var-file=codebeneath.tfvars
+   ```
+
+> When creating a cluster, the only valid value for the Type parameter in PublicAccess is DISABLED.
 
 ## Kafka Client EC2 Setup
 ```bash

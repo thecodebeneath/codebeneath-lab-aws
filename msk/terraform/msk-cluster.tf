@@ -93,7 +93,7 @@ resource "aws_msk_cluster" "kafka-cluster" {
 
     connectivity_info {
       public_access {
-        type = "SERVICE_PROVIDED_EIPS"
+        type = var.enable-kafka-public-acccess
       }
       # multi-vpc private connectivity settings
       # vpc_connectivity {
