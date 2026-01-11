@@ -8,7 +8,7 @@ resource "aws_iam_role" "bootstrap-ec2-role" {
       Action = "sts:AssumeRole"
       Principal = {
         Service = "ec2.amazonaws.com"
-        }
+      }
       Effect = "Allow"
     }]
   })

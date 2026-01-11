@@ -3,6 +3,9 @@
 # This default SG will be associated to VPCs, but unused - make it deny/deny for security compliance
 resource "aws_default_security_group" "default-sg" {
   vpc_id = aws_vpc.lab.id
+  tags = {
+    Name = "${var.project-name}-default-sg"
+  }
 }
 
 resource "aws_vpc" "lab" {
